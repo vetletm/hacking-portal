@@ -10,6 +10,13 @@
       - ca-certificates
       - curl
       - software-properties-common
+      - python3-pip
+  become: yes
+
+- name: Install Docker Python module
+  pip:
+    name: docker
+    state: latest
   become: yes
 
 - name: Add Docker GPG key
