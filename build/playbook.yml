@@ -28,6 +28,24 @@
       register: swarm_info
       become: yes
 
-    - name: Get manager token
+    - name: Get join token
       set_fact:
-        manager_token: '{{ swarm_info.swarm_facts.JoinTokens.Manager }}'
+        join_token: '{{ swarm_info.swarm_facts.JoinTokens.Manager }}'
+
+- hosts: docker:!docker1
+  tasks:
+    - name: Get current swarm state
+      docker_swarm:
+        state: inspect
+      register: swarm_info
+      become: yes
+
+    - name: Join swarm
+      when: swarm_info.swarm_facts is not defined
+      docker_swarm:
+        state: join
+        advertise_addr: "{{ ansible_default_ipv4.address }}"
+        remote_addrs:
+          - "{{ hostvars[groups['docker1'][0]].ansible_default_ipv4.address }}:2377"
+        join_token: "{{ hostvars[groups['docker1'][0]].join_token }}"
+      become: yes
