@@ -5,6 +5,8 @@ import (
 	"strconv"
 
 	"hacking-portal/db"
+
+	"github.com/go-chi/chi"
 )
 
 // AdminEndpoint is an implementation of the endpoint for all Admin-related methods.
