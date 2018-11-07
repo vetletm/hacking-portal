@@ -72,11 +72,14 @@ func (StudentDatabase) FindGroups() ([]int, error) {
 	}
 
 	// populate array with unique group IDs
-	var groupExists []bool
+	groupExists := map[int]bool{}
 	for _, student := range students {
-		if student.GroupID != 0 && !groupExists[student.GroupID] {
-			groupIDs = append(groupIDs, student.GroupID)
-			groupExists[student.GroupID] = true
+		groupID := student.GroupID
+		if groupID != 0 {
+			if _, isset := groupExists[groupID]; !isset {
+				groupIDs = append(groupIDs, groupID)
+				groupExists[groupID] = true
+			}
 		}
 	}
 
