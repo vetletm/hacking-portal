@@ -9,6 +9,7 @@ resource "openstack_compute_instance_v2" "docker" {
   security_groups = [
     "${openstack_compute_secgroup_v2.ssh.name}",
     "${openstack_compute_secgroup_v2.http.name}",
+    "${openstack_compute_secgroup_v2.swarm.name}",
   ]
 
   network = {
@@ -57,4 +58,39 @@ resource "openstack_compute_floatingip_associate_v2" "docker" {
 resource "openstack_compute_keypair_v2" "docker" {
   name       = "docker"
   public_key = "${var.os_keypair}"
+}
+
+# create security group for swarm communication
+resource "openstack_compute_secgroup_v2" "swarm" {
+  # https://docs.docker.com/engine/swarm/swarm-tutorial/#open-protocols-and-ports-between-the-hosts
+  name        = "swarm"
+  description = "Docker Swarm communication"
+
+  rule {
+    from_port   = 2377
+    to_port     = 2377
+    ip_protocol = "tcp"
+    cidr        = "${var.docker_cidr}"
+  }
+
+  rule {
+    from_port   = 7946
+    to_port     = 7946
+    ip_protocol = "tcp"
+    cidr        = "${var.docker_cidr}"
+  }
+
+  rule {
+    from_port   = 7946
+    to_port     = 7946
+    ip_protocol = "udp"
+    cidr        = "${var.docker_cidr}"
+  }
+
+  rule {
+    from_port   = 4789
+    to_port     = 4789
+    ip_protocol = "udp"
+    cidr        = "${var.docker_cidr}"
+  }
 }
