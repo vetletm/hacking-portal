@@ -2,7 +2,6 @@ package routes
 
 import (
 	"net/http"
-	"strconv"
 
 	"hacking-portal/db"
 
@@ -43,7 +42,7 @@ func (storage *StudentEndpoint) PostGroupJoin(w http.ResponseWriter, r *http.Req
 	// - should only work with students that are not in a group
 	//   - (respond somehow nicely)
 
-	groupID := strconv.Atoi(chi.URLParam(r, "id"))
+	// groupID, _ := strconv.Atoi(chi.URLParam(r, "id"))
 }
 
 // PostGroupCreate creates a new group and assigns the authenticated student to it
@@ -54,7 +53,7 @@ func (storage *StudentEndpoint) PostGroupCreate(w http.ResponseWriter, r *http.R
 	// - should only work with students that are not in a group
 	//   - (respond somehow nicely)
 
-	groupID := strconv.Atoi(chi.URLParam(r, "id"))
+	// groupID, _ := strconv.Atoi(chi.URLParam(r, "id"))
 }
 
 // PostGroupLeave removes the authenticated student from its current group
@@ -73,7 +72,7 @@ func (storage *StudentEndpoint) PostRestart(w http.ResponseWriter, r *http.Reque
 	// - should only work for IDs the group has access to
 	//   - (respond somehow nicely)
 
-	machineUUID := chi.URLParam(r, "machine")
+	// machineUUID := chi.URLParam(r, "machine")
 }
 
 // PostTask stores a task's answer for the authenticated student's group
@@ -81,7 +80,7 @@ func (storage *StudentEndpoint) PostTask(w http.ResponseWriter, r *http.Request)
 	// TODO:
 	// - lets a group submit a task result
 
-	taskID := strconv.Atoi(chi.URLParam(r, "task"))
+	// taskID, _ := strconv.Atoi(chi.URLParam(r, "task"))
 }
 
 // StudentRouter sets up routing for the student web interface
