@@ -5,6 +5,8 @@ import (
 	"strconv"
 
 	"hacking-portal/db"
+
+	"github.com/go-chi/chi"
 )
 
 // StudentEndpoint is an implementation of the endpoint for all Student-related methods.
