@@ -26,7 +26,7 @@ func TestAnswerFindAll(t *testing.T) {
 	// new database type
 	tdb := AnswerDatabase{}
 
-	// attempt to find
+	// attempt to find answers
 	answers, err := tdb.FindAll()
 
 	// assert output
@@ -50,10 +50,10 @@ func TestAnswerFindByGroup(t *testing.T) {
 	// new database type
 	tdb := AnswerDatabase{}
 
-	// attempt to find answer by group
+	// attempt to find answers by group
 	answers, err := tdb.FindByGroup(1) // from the Upsert test
 
 	// assert output
-	require.Nil(t, err, "failed to get single answer")
+	require.Nil(t, err, "failed to get answers")
 	require.Len(t, answers, 1) // this runs after upsert, so there should be 1
 }
