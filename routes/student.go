@@ -10,10 +10,10 @@ import (
 // StudentEndpoint is an implementation of the endpoint for all Student-related methods.
 // Database interfaces for all the methods are expected to be provided.
 type StudentEndpoint struct {
-	answers  db.AnswerStorage
-	machines db.MachineStorage
-	students db.StudentStorage
-	tasks    db.TaskStorage
+	Answers  db.AnswerStorage
+	Machines db.MachineStorage
+	Students db.StudentStorage
+	Tasks    db.TaskStorage
 }
 
 // GetHomepage renders a view for the student web interface
@@ -84,7 +84,12 @@ func (storage *StudentEndpoint) PostTask(w http.ResponseWriter, r *http.Request)
 
 // StudentRouter sets up routing for the student web interface
 func StudentRouter() chi.Router {
-	ep := StudentEndpoint{new(db.StudentDatabase)}
+	ep := StudentEndpoint{
+		Answers:  new(db.AnswerDatabase),
+		Machines: new(db.MachineDatabase),
+		Students: new(db.StudentDatabase),
+		Tasks:    new(db.TaskDatabase),
+	}
 
 	r := chi.NewRouter()
 	r.Get("/", ep.GetHomepage)

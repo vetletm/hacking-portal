@@ -10,10 +10,10 @@ import (
 // AdminEndpoint is an implementation of the endpoint for all Admin-related methods.
 // Database interfaces for all the methods are expected to be provided.
 type AdminEndpoint struct {
-	answers  db.AnswerStorage
-	machines db.MachineStorage
-	students db.StudentStorage
-	tasks    db.TaskStorage
+	Answers  db.AnswerStorage
+	Machines db.MachineStorage
+	Students db.StudentStorage
+	Tasks    db.TaskStorage
 }
 
 // GetHomepage renders a view for the administration web interface
@@ -96,7 +96,12 @@ func (storage *AdminEndpoint) GetGroup(w http.ResponseWriter, r *http.Request) {
 
 // AdminRouter sets up routing for the administration web interface
 func AdminRouter() chi.Router {
-	ep := AdminEndpoint{new(db.AdminDatabase)}
+	ep := AdminEndpoint{
+		Answers:  new(db.AnswerDatabase),
+		Machines: new(db.MachineDatabase),
+		Students: new(db.StudentDatabase),
+		Tasks:    new(db.TaskDatabase),
+	}
 
 	r := chi.NewRouter()
 	r.Get("/", ep.GetHomepage)
