@@ -14,7 +14,7 @@ import (
 type TaskStorage interface {
 	FindByID(int) (models.Task, error)
 	FindTasks() ([]models.Task, error)
-	Upsert(models.Task) error
+	Upsert(models.Task) (models.Task, error)
 }
 
 // TaskDatabase is an implementation of the storage for all Task-related methods
@@ -34,12 +34,14 @@ func (TaskDatabase) FindTasks() ([]models.Task, error) {
 	return tasks, err
 }
 
-// Upsert adds/updates the task to the database
-func (TaskDatabase) Upsert(task models.Task) error {
+// Upsert adds/updates the task to the database and returns the updated version
+func (TaskDatabase) Upsert(task models.Task) (models.Task, error) {
+	// insert or update the task
 	_, err := db.C("tasks").Find(bson.M{"id": task.ID}).Apply(mgo.Change{
-		Update: task,
-		Upsert: true,
-	}, nil)
+		Update:    task,
+		Upsert:    true,
+		ReturnNew: true,
+	}, &task)
 
-	return err
+	return task, err
 }
