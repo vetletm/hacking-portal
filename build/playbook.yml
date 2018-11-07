@@ -5,3 +5,29 @@
 - hosts: docker
   roles:
     - docker
+
+- hosts: 'docker.0'
+  tasks:
+    - name: Get current Swarm state
+      docker_swarm:
+        state: inspect
+      register: swarm_info
+      become: yes
+
+    - name: Initialize a swarm
+      when: swarm_info.swarm_facts is not defined
+      docker_swarm:
+        state: present
+        advertise_addr: '{{ ansible_default_ipv4.address }}'
+      become: yes
+
+    - name: Get latest Swarm state
+      # https://github.com/ansible/ansible/issues/15710#issuecomment-216645922
+      docker_swarm:
+        state: inspect
+      register: swarm_info
+      become: yes
+
+    - name: Get manager token
+      set_fact:
+        manager_token: '{{ swarm_info.swarm_facts.JoinTokens.Manager }}'
