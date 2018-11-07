@@ -36,6 +36,20 @@ func (TaskDatabase) FindTasks() ([]models.Task, error) {
 
 // Upsert adds/updates the task to the database and returns the updated version
 func (TaskDatabase) Upsert(task models.Task) (models.Task, error) {
+	// get the next available task ID for when creating a new task
+	if task.ID == 0 {
+		var ids map[string]int
+		if _, err := db.C("counters").Find(nil).Apply(mgo.Change{
+			Update:    bson.M{"$inc": bson.M{"nextTaskID": 1}},
+			Upsert:    true,
+			ReturnNew: true,
+		}, &ids); err != nil {
+			return task, err
+		}
+
+		task.ID = ids["nextTaskID"]
+	}
+
 	// insert or update the task
 	_, err := db.C("tasks").Find(bson.M{"id": task.ID}).Apply(mgo.Change{
 		Update:    task,
