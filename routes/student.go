@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/vetletm/hacking-portal/db"
+	"hacking-portal/db"
 )
 
 // StudentEndpoint is an implementation of the endpoint for all Student-related methods.

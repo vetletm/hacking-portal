@@ -1,8 +1,9 @@
 package db
 
 import (
+	"hacking-portal/models"
+
 	"github.com/globalsign/mgo/bson"
-	"github.com/vetletm/hacking-portal/models"
 )
 
 // TaskStorage is an interface describing the methods of the TaskDatabase struct
