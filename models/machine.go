@@ -1,8 +1,7 @@
 package models
 
 type Machine struct {
-	ID      string `bson:"machineID"`
-	Name    string `bson:"machineName"`
+	ID      string `bson:"uuid"`
+	Name    string `bson:"name"`
 	GroupID int    `bson:"groupID"`
-	PEM     string `bson:"PEM"`
 }
