@@ -3,8 +3,12 @@ package db
 import (
 	"hacking-portal/models"
 
+	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 )
+
+// students collection structure:
+// { id, alias, name, groupID }
 
 // StudentStorage is an interface describing the methods of the StudentDatabase struct
 type StudentStorage interface {
@@ -56,6 +60,10 @@ func (StudentDatabase) FindByGroup(groupID int) ([]models.Student, error) {
 
 // Upsert adds/updates the student to the database
 func (StudentDatabase) Upsert(student models.Student) error {
-	// TODO
-	return nil
+	_, err := db.C("students").Find(bson.M{"id": student.ID}).Apply(mgo.Change{
+		Update: student,
+		Upsert: true,
+	}, nil)
+
+	return err
 }

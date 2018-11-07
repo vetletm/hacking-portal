@@ -3,8 +3,12 @@ package db
 import (
 	"hacking-portal/models"
 
+	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 )
+
+// answers collection structure:
+// { groupID, taskID, answer }
 
 // AnswerStorage is an interface describing the methods of the AnswerDatabase struct
 type AnswerStorage interface {
@@ -40,6 +44,13 @@ func (AnswerDatabase) FindByGroup(groupID int) ([]models.Answer, error) {
 
 // Upsert adds/updates the answer to the database
 func (AnswerDatabase) Upsert(answer models.Answer) error {
-	// TODO
-	return nil
+	_, err := db.C("answers").Find(bson.M{"$and": []bson.M{
+		bson.M{"groupID": answer.GroupID},
+		bson.M{"taskID": answer.TaskID},
+	}}).Apply(mgo.Change{
+		Update: answer,
+		Upsert: true,
+	}, nil)
+
+	return err
 }

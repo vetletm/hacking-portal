@@ -3,8 +3,12 @@ package db
 import (
 	"hacking-portal/models"
 
+	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 )
+
+// machines collection structure:
+// { uuid, name, groupID }
 
 // MachineStorage is an interface describing the methods of the MachineDatabase struct
 type MachineStorage interface {
@@ -27,7 +31,7 @@ func (MachineDatabase) FindAll() ([]models.Machine, error) {
 // FindByID returns a single machine by ID
 func (MachineDatabase) FindByID(uuid string) (models.Machine, error) {
 	var machine models.Machine
-	err := db.C("machines").Find(bson.M{"machineID": uuid}).One(&machine)
+	err := db.C("machines").Find(bson.M{"uuid": uuid}).One(&machine)
 	return machine, err
 }
 
@@ -40,6 +44,10 @@ func (MachineDatabase) FindByGroup(groupID int) ([]models.Machine, error) {
 
 // Upsert adds/updates the machine to the database
 func (MachineDatabase) Upsert(machine models.Machine) error {
-	// TODO
-	return nil
+	_, err := db.C("machines").Find(bson.M{"uuid": machine.ID}).Apply(mgo.Change{
+		Update: machine,
+		Upsert: true,
+	}, nil)
+
+	return err
 }

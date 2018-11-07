@@ -3,8 +3,12 @@ package db
 import (
 	"hacking-portal/models"
 
+	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 )
+
+// tasks collection structure:
+// { id, description, answer, deadline }
 
 // TaskStorage is an interface describing the methods of the TaskDatabase struct
 type TaskStorage interface {
@@ -19,7 +23,7 @@ type TaskDatabase struct{}
 // FindByID returns a single task by ID
 func (TaskDatabase) FindByID(id int) (models.Task, error) {
 	var task models.Task
-	err := db.C("tasks").Find(bson.M{"taskID": id}).One(&task)
+	err := db.C("tasks").Find(bson.M{"id": id}).One(&task)
 	return task, err
 }
 
@@ -32,6 +36,10 @@ func (TaskDatabase) FindTasks() ([]models.Task, error) {
 
 // Upsert adds/updates the task to the database
 func (TaskDatabase) Upsert(task models.Task) error {
-	// TODO
-	return nil
+	_, err := db.C("tasks").Find(bson.M{"id": task.ID}).Apply(mgo.Change{
+		Update: task,
+		Upsert: true,
+	}, nil)
+
+	return err
 }
