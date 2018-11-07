@@ -4,31 +4,31 @@ import "testing"
 
 // TODO: database mocking
 
-func TestGetHomepage(t *testing.T) {
+func TestStudentGetHomepage(t *testing.T) {
 	// TODO
 }
 
-func TestGetGroups(t *testing.T) {
+func TestStudentGetGroups(t *testing.T) {
 	// TODO
 }
 
-func TestPostGroupJoin(t *testing.T) {
+func TestStudentPostGroupJoin(t *testing.T) {
 	// TODO
 }
 
-func TestPostGroupCreate(t *testing.T) {
+func TestStudentPostGroupCreate(t *testing.T) {
 	// TODO
 }
 
-func TestPostGroupLeave(t *testing.T) {
+func TestStudentPostGroupLeave(t *testing.T) {
 	// TODO
 }
 
-func TestPostRestart(t *testing.T) {
+func TestStudentPostRestart(t *testing.T) {
 	// TODO
 }
 
-func TestPostTask(t *testing.T) {
+func TestStudentPostTask(t *testing.T) {
 	// TODO
 }
 
