@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+
+#
+# the inventory from Terraform Inventory does not give the hosts their floating IPs,
+# so we wrap the script and create our own inventory
+#
+
+import re
+import json
+import subprocess
+
+# get json inventory from local terraform state file
+# (by default: .terraform/terraform.tfstate)
+p = subprocess.Popen(
+	['terraform-inventory', '-list'],
+	stdout=subprocess.PIPE,
+	stderr=subprocess.PIPE)
+out, err = p.communicate()
+
+# get a inventory json list from the output
+inventory = json.loads(out.strip().decode())
+
+# prepare a new inventory
+new_inventory = {
+	'all': {'hosts': []},
+	'docker': [],
+	'kali': [],
+}
+
+# iterate through the IPs and add them to the inventory
+for host in ('docker', 'kali'):
+	i = 0
+	for ip in inventory[host]:
+		if ip.startswith('10.212.'):
+			new_inventory[host].append(ip)
+			new_inventory['all']['hosts'].append(ip)
+			new_inventory['{}.{}'.format(host, i)] = [ip]
+			i += 1
+
+# dump the inventory as a json string
+print(json.dumps(new_inventory, indent=4))
