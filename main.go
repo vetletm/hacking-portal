@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"os"
 
+	"hacking-portal/db"
+	"hacking-portal/routes"
+
 	"github.com/go-chi/chi"
-	"github.com/vetletm/hacking-portal/db"
-	"github.com/vetletm/hacking-portal/routes"
 )
 
 func main() {
