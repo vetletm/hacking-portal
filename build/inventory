@@ -29,12 +29,12 @@ new_inventory = {
 
 # iterate through the IPs and add them to the inventory
 for host in ('docker', 'kali'):
-	i = 0
+	i = 1
 	for ip in inventory[host]:
 		if ip.startswith('10.212.'):
 			new_inventory[host].append(ip)
 			new_inventory['all']['hosts'].append(ip)
-			new_inventory['{}.{}'.format(host, i)] = [ip]
+			new_inventory['{}{}'.format(host, i)] = [ip]
 			i += 1
 
 # dump the inventory as a json string

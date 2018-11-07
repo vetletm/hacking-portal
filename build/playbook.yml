@@ -6,7 +6,7 @@
   roles:
     - docker
 
-- hosts: 'docker.0'
+- hosts: docker1
   tasks:
     - name: Get current Swarm state
       docker_swarm:
