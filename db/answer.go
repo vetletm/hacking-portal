@@ -15,7 +15,7 @@ type AnswerStorage interface {
 	FindAll() ([]models.Answer, error)
 	FindByID(int) (models.Answer, error)
 	FindByGroup(int) ([]models.Answer, error)
-	Upsert(models.Answer) error
+	Upsert(models.Answer) (models.Answer, error)
 }
 
 // AnswerDatabase is an implementation of the storage for all Answer-related methods
@@ -43,14 +43,15 @@ func (AnswerDatabase) FindByGroup(groupID int) ([]models.Answer, error) {
 }
 
 // Upsert adds/updates the answer to the database
-func (AnswerDatabase) Upsert(answer models.Answer) error {
+func (AnswerDatabase) Upsert(answer models.Answer) (models.Answer, error) {
 	_, err := db.C("answers").Find(bson.M{"$and": []bson.M{
 		bson.M{"groupID": answer.GroupID},
 		bson.M{"taskID": answer.TaskID},
 	}}).Apply(mgo.Change{
-		Update: answer,
-		Upsert: true,
-	}, nil)
+		Update:    answer,
+		Upsert:    true,
+		ReturnNew: true,
+	}, &answer)
 
-	return err
+	return answer, err
 }
