@@ -2,7 +2,6 @@ package routes
 
 import (
 	"net/http"
-	"strconv"
 
 	"hacking-portal/db"
 
@@ -43,8 +42,12 @@ func (storage *AdminEndpoint) PostAssign(w http.ResponseWriter, r *http.Request)
 	// - if group ID is empty, unassign the machine from any group
 	// - needs validation (just in case)
 
-	machineUUID := chi.URLParam(r, "machine")
-	groupID := strconv.Atoi(chi.URLParam(r, "id"))
+	// var groupID int
+	// machineUUID := chi.URLParam(r, "machine")
+
+	// if val := chi.URLParam(r, "id"); val != "" {
+	// 	groupID, _ = strconv.Atoi(chi.URLParam(r, "id"))
+	// }
 }
 
 // GetTasks renders a view of all tasks
@@ -75,7 +78,7 @@ func (storage *AdminEndpoint) EditTask(w http.ResponseWriter, r *http.Request) {
 	// - changes an existing task
 	// - if the description was changed, make sure students get a notification or smth next time they visit their homepage
 
-	taskID := strconv.Atoi(chi.URLParam(r, "task"))
+	// taskID, _ := strconv.Atoi(chi.URLParam(r, "task"))
 }
 
 // GetGroups renders a view of all groups
@@ -93,7 +96,7 @@ func (storage *AdminEndpoint) GetGroup(w http.ResponseWriter, r *http.Request) {
 	//   - which machines they have access to
 	//   - tasks status (like the tasks list)
 
-	groupID := strconv.Atoi(chi.URLParam(r, "id"))
+	// groupID, _ := strconv.Atoi(chi.URLParam(r, "id"))
 }
 
 // AdminRouter sets up routing for the administration web interface
@@ -110,8 +113,8 @@ func AdminRouter() chi.Router {
 
 	r.Route("/machines", func(r chi.Router) {
 		r.Get("/", ep.GetMachines)
-		r.Post("/{machine:[A-Za-z0-9-]+}", ep.PostUnassign)
-		r.Post("/{machine:[A-Za-z0-9-]+}/{id:[0-9]+}", ep.PostAssign)
+		// r.Post("/{machine:[A-Za-z0-9-]+}", ep.PostUnassign)
+		r.Post("/{machine:[A-Za-z0-9-]+}(?:/{id:[0-9]+})?", ep.PostAssign)
 	})
 
 	r.Route("/tasks", func(r chi.Router) {
