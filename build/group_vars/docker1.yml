@@ -1,0 +1,6 @@
+---
+# this file contains secrets used for the services run in Docker Swarm
+# this is just an example file, not our actual production values
+mongo_root_user: foo
+mongo_root_pass: bar
+

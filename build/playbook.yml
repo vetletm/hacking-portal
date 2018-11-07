@@ -49,3 +49,7 @@
           - "{{ hostvars[groups['docker1'][0]].ansible_default_ipv4.address }}:2377"
         join_token: "{{ hostvars[groups['docker1'][0]].join_token }}"
       become: yes
+
+- hosts: docker1
+  roles:
+    - stack

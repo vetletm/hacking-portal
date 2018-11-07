@@ -13,10 +13,14 @@
       - python3-pip
   become: yes
 
-- name: Install Docker Python module
+- name: Install Python dependencies
   pip:
-    name: docker
+    name: '{{ packages }}'
     state: latest
+  vars:
+    packages:
+      - docker
+      - jsondiff
   become: yes
 
 - name: Add Docker GPG key
