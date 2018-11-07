@@ -113,8 +113,10 @@ func AdminRouter() chi.Router {
 
 	r.Route("/machines", func(r chi.Router) {
 		r.Get("/", ep.GetMachines)
-		// r.Post("/{machine:[A-Za-z0-9-]+}", ep.PostUnassign)
-		r.Post("/{machine:[A-Za-z0-9-]+}(?:/{id:[0-9]+})?", ep.PostAssign)
+		r.Route("/{machine:[A-Za-z0-9-]+}", func(r chi.Router) {
+			r.Post("/", ep.PostAssign)
+			r.Post("/{id:[0-9]+}", ep.PostAssign)
+		})
 	})
 
 	r.Route("/tasks", func(r chi.Router) {
