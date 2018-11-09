@@ -1,3 +1,10 @@
+# use http backend for tfstate storage, config provided through
+# `terraform init` to keep it confidential
+# https://www.terraform.io/docs/backends/config.html#partial-configuration
+terraform {
+  backend "http" {}
+}
+
 # create a router that the internal network will use as a gateway
 resource "openstack_networking_router_v2" "router" {
   name                = "router1"
