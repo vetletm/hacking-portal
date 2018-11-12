@@ -3,4 +3,6 @@
 # this is just an example file, not our actual production values
 mongo_root_user: foo
 mongo_root_pass: bar
+mongo_service_user: foo
+mongo_service_pass: bar
 
