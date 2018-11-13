@@ -24,6 +24,10 @@
               restart_policy:
                 condition: on-failure
                 delay: 5s
+              placement:
+                constraints:
+                  - node.hostname==docker1
+
             ports:
               - 27017:27017
             environment:
