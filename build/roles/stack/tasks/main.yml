@@ -1,0 +1,37 @@
+- name: Copy MongoDB user configuration
+  template:
+    src: mongo_user.js.j2
+    dest: /opt/mongo_user.js
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+
+# docker_stack is a module available since Ansible 2.8, we've imported it ourselves
+# https://github.com/ansible/ansible/pull/24588
+- name: Deploy
+  become: yes
+  docker_stack:
+    state: present
+    name: hacking-portal
+    prune: yes
+    compose:
+      - version: '3.7'
+        services:
+          mongo:
+            image: mongo:latest
+            deploy:
+              restart_policy:
+                condition: on-failure
+                delay: 5s
+            ports:
+              - 27017:27017
+            environment:
+              - MONGO_INITDB_ROOT_USERNAME={{mongo_root_user}}
+              - MONGO_INITDB_ROOT_PASSWORD={{mongo_root_pass}}
+            configs:
+              - source: mongo_user
+                target: /docker-entrypoint-initdb.d/20-user.js
+        configs:
+          mongo_user:
+            file: /opt/mongo_user.js

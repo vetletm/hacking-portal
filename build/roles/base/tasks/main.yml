@@ -1,0 +1,14 @@
+- name: Install base packages
+  apt:
+    name: '{{ packages }}'
+    state: latest
+    update_cache: yes
+  vars:
+    packages:
+      - vim
+  become: yes
+
+- name: Set timezone
+  timezone:
+    name: Europe/Oslo
+  become: yes

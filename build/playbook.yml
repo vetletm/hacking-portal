@@ -1,0 +1,55 @@
+- hosts: docker:kali
+  roles:
+    - base
+
+- hosts: docker
+  roles:
+    - docker
+
+- hosts: docker1
+  tasks:
+    - name: Get current Swarm state
+      docker_swarm:
+        state: inspect
+      register: swarm_info
+      become: yes
+
+    - name: Initialize a swarm
+      when: swarm_info.swarm_facts is not defined
+      docker_swarm:
+        state: present
+        advertise_addr: '{{ ansible_default_ipv4.address }}'
+      become: yes
+
+    - name: Get latest Swarm state
+      # https://github.com/ansible/ansible/issues/15710#issuecomment-216645922
+      docker_swarm:
+        state: inspect
+      register: swarm_info
+      become: yes
+
+    - name: Get join token
+      set_fact:
+        join_token: '{{ swarm_info.swarm_facts.JoinTokens.Manager }}'
+
+- hosts: docker:!docker1
+  tasks:
+    - name: Get current swarm state
+      docker_swarm:
+        state: inspect
+      register: swarm_info
+      become: yes
+
+    - name: Join swarm
+      when: swarm_info.swarm_facts is not defined
+      docker_swarm:
+        state: join
+        advertise_addr: "{{ ansible_default_ipv4.address }}"
+        remote_addrs:
+          - "{{ hostvars[groups['docker1'][0]].ansible_default_ipv4.address }}:2377"
+        join_token: "{{ hostvars[groups['docker1'][0]].join_token }}"
+      become: yes
+
+- hosts: docker1
+  roles:
+    - stack
