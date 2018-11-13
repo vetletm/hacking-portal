@@ -1,8 +1,5 @@
 db.createUser({
 	user: "{{mongo_service_user}}",
 	pwd: "{{mongo_service_pass}}",
-	roles: [
-		{role: "readWrite", db: "portal"},
-		{role: "dbAdmin", db: "portal"}
-	]
+	roles: ["readWrite"]
 })
