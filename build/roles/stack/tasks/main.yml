@@ -7,6 +7,20 @@
     mode: 0644
   become: yes
 
+# the docker_image module doesn't support building from URL,
+# so we check the image hash before and flag the build as changed if they differ
+- name: Get Docker image hash
+  shell: docker images -q --no-trunc portal:latest
+  register: before_hash
+  changed_when: false
+  become: yes
+
+- name: Build application Docker image
+  shell: docker build -t portal:latest https://github.com/vetletm/hacking-portal.git
+  register: after_hash
+  changed_when: after_hash.stdout != before_hash.stdout
+  become: yes
+
 # docker_stack is a module available since Ansible 2.8, we've imported it ourselves
 # https://github.com/ansible/ansible/pull/24588
 - name: Deploy
@@ -33,6 +47,19 @@
             configs:
               - source: mongo_user
                 target: /docker-entrypoint-initdb.d/20-user.js
+          portal:
+            image: portal:latest
+            deploy:
+              restart_policy:
+                condition: on-failure
+                delay: 5s
+            ports:
+              - 80:8080
+            environment:
+              - MONGO_URL=mongo:27017
+              - MONGO_NAME=portal
+              - MONGO_USER={{mongo_service_user}}
+              - MONGO_PASS={{mongo_service_pass}}
         configs:
           mongo_user:
             file: /opt/mongo_user.js
