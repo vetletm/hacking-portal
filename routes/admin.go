@@ -15,8 +15,8 @@ type AdminEndpoint struct {
 	Students db.StudentStorage
 }
 
-// GetHomepage renders a view for the administration web interface
-func (storage *AdminEndpoint) GetHomepage(w http.ResponseWriter, r *http.Request) {
+// GetDashboard renders a view of the administration interface
+func (storage *AdminEndpoint) GetDashboard(w http.ResponseWriter, r *http.Request) {
 	// TODO:
 	// - shows buttons for pages
 	//   - view machines
@@ -24,8 +24,8 @@ func (storage *AdminEndpoint) GetHomepage(w http.ResponseWriter, r *http.Request
 	//   - view groups
 }
 
-// GetMachines renders a view of all the machines in OpenStack
-func (storage *AdminEndpoint) GetMachines(w http.ResponseWriter, r *http.Request) {
+// PostMachineAssign handles machine restart requests
+func (storage *AdminEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.Request) {
 	// TODO:
 	// - lists machines and their assigned groups
 	//   - the assigned group is a dropdown that defaults to nothing
@@ -33,8 +33,8 @@ func (storage *AdminEndpoint) GetMachines(w http.ResponseWriter, r *http.Request
 	// - have some sorting? (machines/groups)
 }
 
-// PostAssign assigns a machine to a group
-func (storage *AdminEndpoint) PostAssign(w http.ResponseWriter, r *http.Request) {
+// PostMachineAssign handles machine group assignment requests
+func (storage *AdminEndpoint) PostMachineAssign(w http.ResponseWriter, r *http.Request) {
 	// TODO:
 	// - assigns a machine to a group by ID
 	// - if group ID is empty, unassign the machine from any group
@@ -56,15 +56,9 @@ func AdminRouter() chi.Router {
 	}
 
 	r := chi.NewRouter()
-	r.Get("/", ep.GetHomepage)
-
-	r.Route("/machines", func(r chi.Router) {
-		r.Get("/", ep.GetMachines)
-		r.Route("/{machine:[A-Za-z0-9-]+}", func(r chi.Router) {
-			r.Post("/", ep.PostAssign)
-			r.Post("/{id:[0-9]+}", ep.PostAssign)
-		})
-	})
+	r.Get("/", ep.GetDashboard)
+	r.Post("/restart/{machineUUID:[A-Za-z0-9-]+}", ep.PostMachineRestart)
+	r.Post("/assign/{machineUUID:[A-Za-z0-9-]+}(?:/{groupID:[0-9]+})?", ep.PostMachineAssign)
 
 	return r
 }
