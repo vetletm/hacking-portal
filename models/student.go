@@ -1,8 +1,7 @@
 package models
 
 type Student struct {
-	ID      int    `bson:"id"`
-	GroupID int    `bson:"groupID"`
+	ID      string `bson:"id"`
 	Name    string `bson:"name"`
-	Alias   string `bson:"alias"`
+	GroupID int    `bson:"groupID"`
 }

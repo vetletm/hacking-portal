@@ -15,8 +15,7 @@ import (
 // StudentStorage is an interface describing the methods of the StudentDatabase struct
 type StudentStorage interface {
 	FindAll() ([]models.Student, error)
-	FindByID(int) (models.Student, error)
-	FindByAlias(string) (models.Student, error)
+	FindByID(string) (models.Student, error)
 	FindByName(string) (models.Student, error)
 	FindByGroup(int) ([]models.Student, error)
 	FindGroups() ([]int, error)
@@ -33,17 +32,10 @@ func (StudentDatabase) FindAll() ([]models.Student, error) {
 	return students, err
 }
 
-// FindByID returns a single student by ID
-func (StudentDatabase) FindByID(id int) (models.Student, error) {
+// FindByID returns a single student by ID (username)
+func (StudentDatabase) FindByID(id string) (models.Student, error) {
 	var student models.Student
 	err := db.C("students").Find(bson.M{"id": id}).One(&student)
-	return student, err
-}
-
-// FindByAlias returns a single student by alias (username)
-func (StudentDatabase) FindByAlias(alias string) (models.Student, error) {
-	var student models.Student
-	err := db.C("students").Find(bson.M{"alias": alias}).One(&student)
 	return student, err
 }
 
