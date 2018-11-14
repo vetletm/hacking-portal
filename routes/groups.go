@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"encoding/json"
+	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -101,12 +103,34 @@ func (storage *GroupsEndpoint) GetGroups(w http.ResponseWriter, r *http.Request)
 
 // PostJoinGroup handles group join requests
 func (storage *GroupsEndpoint) PostJoinGroup(w http.ResponseWriter, r *http.Request) {
-	// TODO
-}
+	// get the user from the session (type-casted)
+	username := r.Context().Value("session_user_id").(string)
 
-// PostLeaveGroup handles group leave requests
-func (storage *GroupsEndpoint) PostLeaveGroup(w http.ResponseWriter, r *http.Request) {
-	// TODO
+	// get the actual sessionUser object from the username
+	sessionUser, err := storage.Students.FindByID(username)
+	if err != nil {
+		http.Error(w, "Invalid user session", http.StatusBadRequest)
+		return
+	}
+
+	var payload map[string]int
+
+	// attempt to decode and validate the body contents, then get the student information
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+	} else if groupID, ok := payload["groupID"]; !ok {
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+	} else {
+		sessionUser.GroupID = groupID
+
+		// attempt to update the sessionUser's group ID
+		if err := storage.Students.Upsert(sessionUser); err != nil {
+			http.Error(w, "Unable to join group", http.StatusInternalServerError)
+		} else {
+			// render a successful message
+			fmt.Fprint(w, "OK")
+		}
+	}
 }
 
 // GroupsRouter sets up routing for the group enrollment view
@@ -116,7 +140,6 @@ func GroupsRouter() chi.Router {
 	r := chi.NewRouter()
 	r.Get("/", ep.GetGroups)
 	r.Post("/join", ep.PostJoinGroup)
-	r.Post("/leave", ep.PostLeaveGroup)
 
 	return r
 }
