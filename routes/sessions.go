@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -96,12 +97,12 @@ func (amw *AuthenticationMiddleware) ValidateUser(creds Credentials) (SessionTyp
 	return InvalidUser, nil
 }
 
-func (amw *AuthenticationMiddleware) ValidateSession(token string) SessionType {
+func (amw *AuthenticationMiddleware) ValidateSession(token string) (SessionType, string) {
 	session, found := amw.TokenUsers[token]
 	if !found {
-		return InvalidUser
+		return InvalidUser, ""
 	}
-	return session.Status
+	return session.Status, session.Username
 }
 
 var amw = AuthenticationMiddleware{}
@@ -144,18 +145,22 @@ func SessionHandler(next http.Handler) http.Handler {
 			}
 
 			var path string
-			switch amw.ValidateSession(c.Value) {
+			sessionType, userID := amw.ValidateSession(c.Value)
+			switch sessionType {
 			case AdminUser:
 				path = "/admin"
 			case StudentUser:
-				path = "/student"
+				path = "/groups"
 			}
+
+			// inject userID into request context
+			r = r.WithContext(context.WithValue(r.Context(), "session_user_id", userID))
 
 			if path != "" {
 				if strings.HasPrefix(r.URL.Path, path) {
 					next.ServeHTTP(w, r)
 				} else {
-					http.Error(w, "Forbidden", http.StatusForbidden)
+					http.Redirect(w, r, path, http.StatusTemporaryRedirect)
 				}
 			} else {
 				http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
