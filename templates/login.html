@@ -1,0 +1,49 @@
+{{define "title"}}Login{{end}}
+
+{{define "navigation"}}{{end}}
+
+{{define "body"}}
+<div class='container w-50'>
+	<header class='m-5'>
+		<h1>Hacking Portal</h1>
+	</header>
+
+	<div class='col-md-5'>
+		<form>
+			<p>Use your NTNU credentials</p>
+			<div class='form-group'>
+				<input class='form-control' placeholder='Username' name='username' autofocus>
+			</div>
+			<div class='form-group'>
+				<input class='form-control' placeholder='Password' name='password' type='password'>
+			</div>
+			<input type='submit' class='btn btn-sm btn-success' value="Login">
+		</form>
+	</div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script type="text/javascript">
+	$('input[type="submit"]').click(function(e){
+		e.preventDefault();
+
+		var username = $('input[name="username"]').val();
+		var password = $('input[name="password"]').val();
+		// TODO: validate if undefined
+
+		$.ajax({
+			type: 'POST',
+			url: '/login',
+			data: JSON.stringify({username: username, password: password}),
+			contentType: 'application/json; charset=UTF-8'
+		}).done(function(){
+			console.log('yay');
+			window.location.pathname = '/'
+		}).fail(function(){
+			// TODO: warn user that something went wrong
+			alert('fuck off');
+		});
+	});
+</script>
+{{end}}
