@@ -1,8 +1,6 @@
 package db
 
 import (
-	"sort"
-
 	"hacking-portal/models"
 
 	"github.com/globalsign/mgo"
@@ -18,7 +16,7 @@ type StudentStorage interface {
 	FindByID(string) (models.Student, error)
 	FindByName(string) (models.Student, error)
 	FindByGroup(int) ([]models.Student, error)
-	FindGroups() ([]int, error)
+	FindGroups() (map[int]int, error)
 	Upsert(models.Student) error
 }
 
@@ -53,9 +51,9 @@ func (StudentDatabase) FindByGroup(groupID int) ([]models.Student, error) {
 	return students, err
 }
 
-// FindGroups returns an array of all group IDs
-func (StudentDatabase) FindGroups() ([]int, error) {
-	var groupIDs []int
+// FindGroups returns a map of all group IDs with the number of members
+func (StudentDatabase) FindGroups() (map[int]int, error) {
+	groupIDs := map[int]int{}
 	var students []models.Student
 
 	// get all students from the database
@@ -64,19 +62,17 @@ func (StudentDatabase) FindGroups() ([]int, error) {
 	}
 
 	// populate array with unique group IDs
-	groupExists := map[int]bool{}
 	for _, student := range students {
 		groupID := student.GroupID
 		if groupID != 0 {
-			if _, isset := groupExists[groupID]; !isset {
-				groupIDs = append(groupIDs, groupID)
-				groupExists[groupID] = true
+			if _, isset := groupIDs[groupID]; !isset {
+				groupIDs[groupID] = 1
+			} else {
+				groupIDs[groupID] += 1
 			}
 		}
 	}
 
-	// sort the array before returning
-	sort.Ints(groupIDs)
 	return groupIDs, nil
 }
 
