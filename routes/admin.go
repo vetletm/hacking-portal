@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"log"
 	"net/http"
 
 	"hacking-portal/db"
@@ -110,7 +109,6 @@ func AdminRouter() chi.Router {
 	}
 
 	r := chi.NewRouter()
-	r.Use(adminOnly)
 	r.Get("/", ep.GetHomepage)
 
 	r.Route("/machines", func(r chi.Router) {
@@ -133,16 +131,4 @@ func AdminRouter() chi.Router {
 	})
 
 	return r
-}
-
-func adminOnly(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if user, isAdmin := GrabSession("00000000"); !isAdmin {
-			log.Println("Authenticated user: ", user)
-			next.ServeHTTP(w, r)
-		} else {
-			log.Println("Authentication failed for user vetletm")
-			http.Error(w, "Forbidden", http.StatusForbidden)
-		}
-	})
 }

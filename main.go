@@ -18,6 +18,7 @@ func main() {
 
 	// set up routing
 	r := chi.NewRouter()
+	r.Use(routes.SessionHandler)
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", routes.GetLogin)
 		r.Mount("/student", routes.StudentRouter())
