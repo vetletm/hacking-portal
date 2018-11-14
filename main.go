@@ -14,15 +14,19 @@ import (
 func main() {
 	// initialize the database connection
 	db.Init(os.Getenv("DB_URL"), os.Getenv("DB_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"))
+	routes.Init(os.Getenv("LDAP_ADDR"),
+		os.Getenv("LDAP_DC"),
+		os.Getenv("COURSE_CODE"),
+		os.Getenv("ADMINS"))
 
 	// set up routing
 	r := chi.NewRouter()
-	r.Route("/", func(r chi.Router) {
-		r.Get("/", routes.GetLogin)
-		r.Mount("/groups", routes.GroupsRouter())
-		r.Mount("/group", routes.GroupRouter())
-		r.Mount("/admin", routes.AdminRouter())
-	})
+	r.Use(routes.SessionHandler)
+	r.Get("/login", routes.GetLogin)
+  r.Post("/login", routes.PostLogin)
+	r.Mount("/groups", routes.GroupsRouter())
+	r.Mount("/group", routes.GroupRouter())
+	r.Mount("/admin", routes.AdminRouter())
 
 	// attempt to get the port from the environment
 	port := os.Getenv("PORT")
