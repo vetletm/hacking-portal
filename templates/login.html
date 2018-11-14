@@ -9,15 +9,15 @@
 	</header>
 
 	<div class='col-md-5'>
-		<form>
+		<form id='form' onsubmit='javascript:;'>
 			<p>Use your NTNU credentials</p>
 			<div class='form-group'>
-				<input class='form-control' placeholder='Username' name='username' autofocus>
+				<input class='form-control' id='username' placeholder='Username' name='username' autofocus>
 			</div>
 			<div class='form-group'>
-				<input class='form-control' placeholder='Password' name='password' type='password'>
+				<input class='form-control' id='password' placeholder='Password' name='password' type='password'>
 			</div>
-			<input type='submit' class='btn btn-sm btn-success' value="Login">
+			<button type='submit' class='btn btn-sm btn-success float-right'>Login</button>
 		</form>
 	</div>
 </div>
@@ -25,24 +25,36 @@
 
 {{define "scripts"}}
 <script type="text/javascript">
-	$('input[type="submit"]').click(function(e){
+	$('button[type="submit"]').click(function(e){
 		e.preventDefault();
 
-		var username = $('input[name="username"]').val();
-		var password = $('input[name="password"]').val();
-		// TODO: validate if undefined
+		var username = document.getElementById('username');
+		var password = document.getElementById('password');
+
+		if(username.value == ""){
+			username.setCustomValidity("Use your NTNU username");
+			username.reportValidity();
+			return;
+		} else
+			username.setCustomValidity("");
+
+		if(password.value == ""){
+			password.setCustomValidity("This is required");
+			password.reportValidity();
+			return;
+		} else
+			password.setCustomValidity("");
 
 		$.ajax({
 			type: 'POST',
 			url: '/login',
-			data: JSON.stringify({username: username, password: password}),
+			data: JSON.stringify({username: username.value, password: password.value}),
 			contentType: 'application/json; charset=UTF-8'
 		}).done(function(){
-			console.log('yay');
 			window.location.pathname = '/'
 		}).fail(function(){
-			// TODO: warn user that something went wrong
-			alert('fuck off');
+			password.setCustomValidity("Username or password was incorrect");
+			password.reportValidity();
 		});
 	});
 </script>
