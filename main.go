@@ -19,7 +19,8 @@ func main() {
 	r := chi.NewRouter()
 	r.Route("/", func(r chi.Router) {
 		r.Get("/", routes.GetLogin)
-		r.Mount("/student", routes.StudentRouter())
+		r.Mount("/groups", routes.GroupsRouter())
+		r.Mount("/group", routes.GroupRouter())
 		r.Mount("/admin", routes.AdminRouter())
 	})
 
