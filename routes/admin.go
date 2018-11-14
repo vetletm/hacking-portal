@@ -11,10 +11,8 @@ import (
 // AdminEndpoint is an implementation of the endpoint for all Admin-related methods.
 // Database interfaces for all the methods are expected to be provided.
 type AdminEndpoint struct {
-	Answers  db.AnswerStorage
 	Machines db.MachineStorage
 	Students db.StudentStorage
-	Tasks    db.TaskStorage
 }
 
 // GetHomepage renders a view for the administration web interface
@@ -50,62 +48,11 @@ func (storage *AdminEndpoint) PostAssign(w http.ResponseWriter, r *http.Request)
 	// }
 }
 
-// GetTasks renders a view of all tasks
-func (storage *AdminEndpoint) GetTasks(w http.ResponseWriter, r *http.Request) {
-	// TODO:
-	// - lists all tasks
-	//   - with each task shows groups' status
-	//     - green = completed AND correct
-	//     - red = completed AND incorrect
-	//     - white/gray = incomplete
-	//   - maybe add statistics of how many groups have completed/successfully
-	// - "new task" form
-	//   - name
-	//   - description
-	//   - correct answer (for the list populating correct answers)
-}
-
-// NewTask creates a new task from form data
-func (storage *AdminEndpoint) NewTask(w http.ResponseWriter, r *http.Request) {
-	// TODO:
-	// - takes a form to create a new task
-	// - form validation
-}
-
-// EditTask modifies an existing task from form data
-func (storage *AdminEndpoint) EditTask(w http.ResponseWriter, r *http.Request) {
-	// TODO:
-	// - changes an existing task
-	// - if the description was changed, make sure students get a notification or smth next time they visit their homepage
-
-	// taskID, _ := strconv.Atoi(chi.URLParam(r, "task"))
-}
-
-// GetGroups renders a view of all groups
-func (storage *AdminEndpoint) GetGroups(w http.ResponseWriter, r *http.Request) {
-	// TODO:
-	// - lists all groups
-}
-
-// GetGroup renders a view of a single group
-func (storage *AdminEndpoint) GetGroup(w http.ResponseWriter, r *http.Request) {
-	// TODO:
-	// - shows single group information
-	//   - group name
-	//   - group members (name + studentID + username)
-	//   - which machines they have access to
-	//   - tasks status (like the tasks list)
-
-	// groupID, _ := strconv.Atoi(chi.URLParam(r, "id"))
-}
-
 // AdminRouter sets up routing for the administration web interface
 func AdminRouter() chi.Router {
 	ep := AdminEndpoint{
-		Answers:  new(db.AnswerDatabase),
 		Machines: new(db.MachineDatabase),
 		Students: new(db.StudentDatabase),
-		Tasks:    new(db.TaskDatabase),
 	}
 
 	r := chi.NewRouter()
@@ -117,17 +64,6 @@ func AdminRouter() chi.Router {
 			r.Post("/", ep.PostAssign)
 			r.Post("/{id:[0-9]+}", ep.PostAssign)
 		})
-	})
-
-	r.Route("/tasks", func(r chi.Router) {
-		r.Get("/", ep.GetTasks)
-		r.Post("/", ep.NewTask)
-		r.Put("/{id:[0-9]+}", ep.EditTask)
-	})
-
-	r.Route("/groups", func(r chi.Router) {
-		r.Get("/", ep.GetGroups)
-		r.Get("/{task:[0-9]+}", ep.GetGroup)
 	})
 
 	return r
