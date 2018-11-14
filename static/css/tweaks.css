@@ -1,0 +1,14 @@
+.navbar-header img.float-left {
+	width: 34px;
+	height: 34px;
+}
+
+.navbar-header .dropdown img {
+	width: 34px;
+	height: 34px;
+}
+
+.navbar-header .dropdown-menu {
+	left: auto;
+	right: 0;
+}

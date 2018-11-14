@@ -38,6 +38,10 @@ func main() {
 	r.Mount("/group", routes.GroupRouter())
 	r.Mount("/admin", routes.AdminRouter())
 
+	// serve static files directly
+	fs := http.FileServer(http.Dir("static/"))
+	r.Handle("/static/*", http.StripPrefix("/static/", fs))
+
 	// attempt to get the port from the environment
 	port := os.Getenv("PORT")
 	if port == "" {

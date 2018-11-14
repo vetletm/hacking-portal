@@ -5,8 +5,10 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -134,7 +136,7 @@ func Init(addr, dn, courseCode, admins string) {
 
 func SessionHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/log") {
+		if strings.HasPrefix(r.URL.Path, "/log") || strings.HasPrefix(r.URL.Path, "/static") {
 			next.ServeHTTP(w, r)
 		} else {
 			c, err := r.Cookie("session_token")
@@ -166,6 +168,17 @@ func SessionHandler(next http.Handler) http.Handler {
 			}
 		}
 	})
+}
+
+func GetLogin(w http.ResponseWriter, r *http.Request) {
+	// prepare and ensure validity of template files
+	tpl := template.Must(template.ParseFiles(
+		path.Join("templates", "layout.html"),
+		path.Join("templates", "login.html"),
+	))
+
+	// render the templates
+	tpl.ExecuteTemplate(w, "layout", nil)
 }
 
 func PostLogin(w http.ResponseWriter, r *http.Request) {
