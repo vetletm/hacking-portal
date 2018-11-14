@@ -68,6 +68,35 @@ func (storage *GroupEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.
 	// TODO
 }
 
+// PostLeaveGroup handles group leave requests
+func (storage *GroupEndpoint) GetLeaveGroup(w http.ResponseWriter, r *http.Request) {
+	// get the user from the session (type-casted)
+	username := r.Context().Value("session_user_id").(string)
+
+	// get the actual sessionUser object from the username
+	sessionUser, err := storage.Students.FindByID(username)
+	if err != nil {
+		http.Error(w, "Invalid user session", http.StatusBadRequest)
+		return
+	}
+
+	// attempt to get the student information, validating it
+	if student, err := storage.Students.FindByID(sessionUser.ID); err != nil {
+		http.Error(w, "Unable to get student data", http.StatusInternalServerError)
+	} else if student.GroupID == 0 {
+		http.Error(w, "Student is not in a group", http.StatusBadRequest)
+	} else {
+		student.GroupID = 0
+
+		if err := storage.Students.Upsert(student); err != nil {
+			http.Error(w, "Unable to leave group", http.StatusInternalServerError)
+		} else {
+			// redirect to the groups view
+			http.Redirect(w, r, "/groups", http.StatusTemporaryRedirect)
+		}
+	}
+}
+
 // GroupRouter sets up routing for the group dashboard view
 func GroupRouter() chi.Router {
 	ep := GroupEndpoint{
@@ -79,6 +108,7 @@ func GroupRouter() chi.Router {
 	r.Get("/", ep.GetDashboard)
 	r.Get("/key/{machineIndex:[0-9]+}", ep.GetMachineKey)
 	r.Post("/restart/{machineIndex:[0-9]+}", ep.PostMachineRestart)
+	r.Get("/leave", ep.GetLeaveGroup)
 
 	return r
 }
