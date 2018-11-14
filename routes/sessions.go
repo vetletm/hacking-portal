@@ -1,43 +1,89 @@
 package routes
 
 import (
-	"hacking-portal/models"
-	"log"
+	"encoding/json"
 	"net/http"
+	"strings"
+)
+
+type SessionType int
+
+// Session stores user, token, and expiration
+type Session struct {
+	UserName string
+	Status   SessionType
+	Expiry   string // nop
+}
+
+// Credentials stores username and password
+type Credentials struct {
+	Password string `json:"password"`
+	Username string `json:"username"`
+}
+
+const (
+	StudentUser SessionType = 1
+	AdminUser   SessionType = 2
+	InvalidUser SessionType = 0
 )
 
 // AuthenticationMiddleware keeps a map of authenticated users
 type AuthenticationMiddleware struct {
-	TokenUsers map[string]models.User
+	TokenUsers map[string]Session
 }
 
-func (amw *AuthenticationMiddleware) Populate() {
-	amw.TokenUsers["00000000"] = models.User{"vetletm", "admin"}
-	amw.TokenUsers["aaaaaaaa"] = models.User{"adrialu", "admin"}
+var amw = AuthenticationMiddleware{}
+
+// func (amw *AuthenticationMiddleware) Populate() {
+// 	amw.TokenUsers["00000000"] = models.User{"vetletm", "admin"}
+// 	amw.TokenUsers["aaaaaaaa"] = models.User{"adrialu", "admin"}
+// 	amw.TokenUsers["abababab"] = models.User{"miebkri", "student"}
+// 	amw.TokenUsers["bcbcbcbc"] = models.User{"random", "student"}
+// }
+//
+// func Init() {
+// 	amw.Populate()
+// }
+
+func ValidateSession(token string) SessionType {
+	session, found := amw.TokenUsers[token]
+	if !found {
+		return InvalidUser
+	}
+	return session.Status
 }
 
-func Init() {
-	amw := AuthenticationMiddleware{}
-	amw.Populate()
-}
-
-func (amw *AuthenticationMiddleware) Middleware(next http.Handler) http.Handler {
+func SessionHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get("X-Session-Token")
+		c, _ := r.Cookie("session_token")
+		// TODO: error handle cookie
 
-		if user, found := amw.TokenUsers[token]; found {
-			// We found the token in our map
-			log.Printf("Authenticated user %s\n", user)
-			// Pass down the request to the next middleware (or final handler)
-			next.ServeHTTP(w, r)
+		var path string
+		switch ValidateSession(c.Value) {
+		case AdminUser:
+			path = "/admin"
+		case StudentUser:
+			path = "/student"
+		}
+
+		if path != "" {
+			if strings.HasPrefix(r.URL.Path, path) {
+				next.ServeHTTP(w, r)
+			} else {
+				http.Error(w, "Forbidden", http.StatusForbidden)
+			}
 		} else {
-			// Write an error and stop the handler chain
-			http.Error(w, "Forbidden", http.StatusForbidden)
+			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		}
 	})
 }
 
-func GrabSession(username string) (string, bool) {
-
-	return "vetletm", true
+func PostLogin(w http.ResponseWriter, r *http.Request) {
+	var creds Credentials
+	err := json.NewDecoder(r.Body).Decode(&creds)
+	if err != nil {
+		// If the structure of the body is wrong, return an HTTP error
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 }
