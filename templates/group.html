@@ -1,0 +1,82 @@
+{{define "title"}}Group {{.User.GroupID}}{{end}}
+
+{{define "body"}}
+<div class='container w-50'>
+	<header class='m-5'>
+		<h1>Group {{.User.GroupID}}</h1>
+	</header>
+
+	<div class='d-flex flex-column'>
+		<div class='row-md-4'>
+			<h3>Kali Machines</h3>
+			{{if .Machines}}
+			<div class='list-group pb-2'>
+			{{range .Machines}}
+				<div class='list-group-item clearfix'>
+					<span class='float-left'>Kali {{.GroupIndex}} <a class='d-inline pl-3' href='#'>{{.Address}}</a></span>
+					<span class='float-right' data-kali-index='{{.GroupIndex}}'>
+						<a class='btn btn-sm btn-outline-default border restart' href='#' data-toggle='tooltip' title='Restart'>
+							<span class='fas fa-redo' aria-hidden='true'></span>
+						</a>
+						<a class='btn btn-sm btn-outline-default border pem-key' href='#' data-toggle='tooltip' title='PEM'>
+							<span class='fas fa-file-download' aria-hidden='true'></span>
+						</a>
+					</span>
+				</div>
+			{{end}}
+			</div>
+			{{end}}
+		</div>
+	</div>
+</div>
+{{end}}
+
+{{define "scripts"}}
+<script type="text/javascript">
+	$('[data-toggle="tooltip"]').tooltip() // enable tooltips
+	$('a.restart').click(function(){
+		if(confirm('This will forcefully restart the machine, losing all unsaved progress. Are you sure you want to do this?')){
+			var button = $(this);
+			var machineIndex = button.parent().data('kali-index');
+
+			// prevent spamming
+			if(button.hasClass('disabled'))
+				return;
+			button.addClass('disabled');
+
+			// reset button color
+			button.removeClass('btn-outline-danger');
+			button.addClass('btn-outline-default');
+
+			// attempt to restart the machine
+			$.ajax({
+				type: 'POST',
+				url: '/group/restart/' + machineIndex
+			}).fail(function(){
+				// give visual indicator that it failed
+				button.addClass('btn-outline-danger');
+				button.removeClass('btn-outline-default');
+			});
+
+			// lock and spin the button for one minute
+			button.children().addClass('fa-spin');
+			setTimeout(function(){
+				button.removeClass('disabled');
+				button.children().removeClass('fa-spin');
+			}, 60 * 1000);
+		}
+	});
+	$('a.pem-key').click(function(){
+		var button = $(this);
+		var machineID = button.parent().data('kali-index');
+
+		// attempt to download the machine's key
+		$.ajax({
+			type: 'GET',
+			url: '/group/key/' + machineIndex
+		}).done({
+			// TODO: download it for the user in the client
+		})
+	});
+</script>
+{{end}}
