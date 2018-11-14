@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -108,6 +109,8 @@ func (storage *AdminEndpoint) PostMachineAssign(w http.ResponseWriter, r *http.R
 	// if val := chi.URLParam(r, "id"); val != "" {
 	// 	groupID, _ = strconv.Atoi(chi.URLParam(r, "id"))
 	// }
+
+	fmt.Fprint(w, "OK")
 }
 
 // AdminRouter sets up routing for the administration web interface
@@ -120,7 +123,7 @@ func AdminRouter() chi.Router {
 	r := chi.NewRouter()
 	r.Get("/", ep.GetDashboard)
 	r.Post("/restart/{machineUUID:[A-Za-z0-9-]+}", ep.PostMachineRestart)
-	r.Post("/assign/{machineUUID:[A-Za-z0-9-]+}(?:/{groupID:[0-9]+})?", ep.PostMachineAssign)
+	r.Post("/assign", ep.PostMachineAssign)
 
 	return r
 }
