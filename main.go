@@ -14,6 +14,7 @@ import (
 func main() {
 	// initialize the database connection
 	db.Init(os.Getenv("DB_URL"), os.Getenv("DB_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"))
+	routes.Init()
 
 	// set up routing
 	r := chi.NewRouter()
