@@ -23,8 +23,9 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(routes.SessionHandler)
 	r.Get("/login", routes.GetLogin)
-	r.Post("/login", routes.PostLogin)
-	r.Mount("/student", routes.StudentRouter())
+  r.Post("/login", routes.PostLogin)
+	r.Mount("/groups", routes.GroupsRouter())
+	r.Mount("/group", routes.GroupRouter())
 	r.Mount("/admin", routes.AdminRouter())
 
 	// attempt to get the port from the environment

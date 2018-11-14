@@ -44,7 +44,7 @@ func (MachineDatabase) FindByGroup(groupID int) ([]models.Machine, error) {
 
 // Upsert adds/updates the machine to the database
 func (MachineDatabase) Upsert(machine models.Machine) error {
-	_, err := db.C("machines").Find(bson.M{"uuid": machine.ID}).Apply(mgo.Change{
+	_, err := db.C("machines").Find(bson.M{"uuid": machine.UUID}).Apply(mgo.Change{
 		Update: machine,
 		Upsert: true,
 	}, nil)
