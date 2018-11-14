@@ -17,7 +17,6 @@ import (
 // Session stores user, token, and expiration
 type Session struct {
 	Username string
-	Name     string
 	Status   SessionType
 	Expiry   time.Time
 }
@@ -135,7 +134,7 @@ func Init(addr, dn, courseCode, admins string) {
 
 func SessionHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/login") {
+		if strings.HasPrefix(r.URL.Path, "/log") {
 			next.ServeHTTP(w, r)
 		} else {
 			c, err := r.Cookie("session_token")
@@ -150,7 +149,7 @@ func SessionHandler(next http.Handler) http.Handler {
 			case AdminUser:
 				path = "/admin"
 			case StudentUser:
-				path = "/groups"
+				path = "/group"
 			}
 
 			// inject userID into request context
@@ -199,4 +198,26 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	})
 
 	fmt.Fprint(w, "OK")
+}
+
+func GetLogout(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("session_token")
+	if err != nil || c.Value == "" {
+		// cookie already doesn't exist, just redirect
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+		return
+	}
+
+	// remove the session from our token storage
+	delete(amw.TokenUsers, c.Value)
+
+	// create a new, dead cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session_token",
+		Value:   "",
+		Expires: time.Now(),
+	})
+
+	// redirec to the login page
+	http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 }
