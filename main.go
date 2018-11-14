@@ -31,6 +31,9 @@ func main() {
 	r.Use(routes.SessionHandler)
 	r.Get("/login", routes.GetLogin)
 	r.Post("/login", routes.PostLogin)
+	r.Get("/logout", routes.GetLogout)
+
+	// let the remaining sub-routes handle themselves
 	r.Mount("/groups", routes.GroupsRouter())
 	r.Mount("/group", routes.GroupRouter())
 	r.Mount("/admin", routes.AdminRouter())
