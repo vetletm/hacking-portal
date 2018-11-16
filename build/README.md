@@ -18,5 +18,5 @@ Used to install the software on all the machines, including Docker, MongoDB and 
 Before running, make sure to populate the credentials in `group_vars/docker1.yml`.  
 Usage:
 ```bash
-ansible-playbook -i interface playbook.yml
+ansible-playbook -i inventory playbook.yml
 ```
