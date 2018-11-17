@@ -20,7 +20,7 @@ func main() {
 		os.Getenv("DB_PASS"))
 
 	// initialize session routing
-	routes.Init(
+	routes.InitAuthentication(
 		os.Getenv("LDAP_ADDR"),
 		os.Getenv("LDAP_DC"),
 		os.Getenv("COURSE_CODE"),

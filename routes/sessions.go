@@ -108,7 +108,7 @@ func (amw *AuthenticationMiddleware) ValidateSession(token string) (SessionType,
 
 var amw = AuthenticationMiddleware{}
 
-func Init(addr, dn, courseCode, admins string) {
+func InitAuthentication(addr, dn, courseCode, admins string) {
 	if addr == "" {
 		log.Fatal("LDAP address must be provided")
 	}
