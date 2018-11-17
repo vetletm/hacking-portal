@@ -67,6 +67,40 @@ func Status(uuid string) (string, error) {
 	return server.Status, err
 }
 
+// Rebuild takes a machine UUID and attempts to rebuild the server
+func Rebuild(uuid string) error {
+	// Check if uuid is in database
+	machine, err := machines.FindByID(uuid)
+	if err != nil {
+		return err
+	}
+
+	// Set openstack region name
+	opts := gophercloud.EndpointOpts{Region: os.Getenv("OS_REGION_NAME")}
+
+	// Configure client for connecting to openstack
+	client, err := openstack.NewComputeV2(provider, opts)
+	if err != nil {
+		return err
+	}
+
+	// Get the server object
+	server, err := servers.Get(client, machine.UUID).Extract()
+	if err != nil {
+		return err
+	}
+
+	// Set the rebuild options. Set new name to be same as old.
+	rebuildOpts := servers.RebuildOpts{
+		Name:    server.Name,
+		ImageID: "Kali Linux 2016.1 xfce amd64",
+	}
+
+	server, err = servers.Rebuild(client, server.ID, rebuildOpts).Extract()
+
+	return err
+}
+
 // Init attempts to setup a connection
 func Init() {
 	AuthOpts, err := openstack.AuthOptionsFromEnv()
