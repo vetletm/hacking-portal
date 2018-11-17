@@ -25,11 +25,11 @@ func Reboot(uuid string) error {
 	// Attempt to reboot the server and return the error
 	err = servers.Reboot(client, uuid, servers.RebootOpts{Type: servers.SoftReboot}).ExtractErr()
 	if err != nil {
-		log.Println("Server: ", uuid, " failed to reboot")
+		log.Println("Server", uuid, "failed to reboot")
 		return err
 	}
 
-	log.Println("Server: ", uuid, " was rebooted")
+	log.Println("Server", uuid, "was rebooted")
 	return err
 }
 
@@ -48,7 +48,7 @@ func Status(uuid string) (string, error) {
 	}
 
 	// Print the status and return
-	log.Println("Server ", server.ID, " is ", server.Status)
+	log.Println("Server", server.ID, "is", server.Status)
 	return server.Status, err
 }
 
