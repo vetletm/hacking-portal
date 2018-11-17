@@ -156,6 +156,14 @@ func SessionHandler(next http.Handler) http.Handler {
 			r = r.WithContext(context.WithValue(r.Context(), "session_user_id", userID))
 
 			if path != "" {
+				// refresh the cookie
+				http.SetCookie(w, &http.Cookie{
+					Name:    "session_token",
+					Value:   c.Value,
+					Path:    "/",
+					Expires: time.Now().Add(1 * time.Hour),
+				})
+
 				if strings.HasPrefix(r.URL.Path, path) {
 					next.ServeHTTP(w, r)
 				} else {
