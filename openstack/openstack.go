@@ -11,7 +11,10 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
+// For accessing methods on machines database
 var machines *db.MachineDatabase
+
+// For connecting to openstack
 var client *gophercloud.ServiceClient
 
 // Reboot takes server UUID and attempts to reboot it
@@ -52,7 +55,7 @@ func Status(uuid string) (string, error) {
 	return server.Status, err
 }
 
-// Rebuild takes a machine UUID and attempts to rebuild the server
+// Rebuild takes a server UUID and attempts to rebuild the server
 func Rebuild(uuid string) error {
 	// Check if uuid is in database
 	_, err := machines.FindByID(uuid)
