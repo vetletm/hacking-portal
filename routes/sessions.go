@@ -207,6 +207,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   sessionToken,
+		Path:    "/",
 		Expires: expiration,
 	})
 
@@ -228,6 +229,7 @@ func GetLogout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:    "session_token",
 		Value:   "",
+		Path:    "/",
 		Expires: time.Now(),
 	})
 
