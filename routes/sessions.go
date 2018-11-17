@@ -139,7 +139,12 @@ func SessionHandler(next http.Handler) http.Handler {
 		if strings.HasPrefix(r.URL.Path, "/admin") || strings.HasPrefix(r.URL.Path, "/group") {
 			c, err := r.Cookie("session_token")
 			if err != nil {
+				// no session
 				http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+				return
+			} else if amw.TokenUsers[c.Value].Expiry.Before(time.Now()) {
+				// session has expired, log the user out
+				http.Redirect(w, r, "/logout", http.StatusTemporaryRedirect)
 				return
 			}
 
