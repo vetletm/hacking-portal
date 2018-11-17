@@ -234,3 +234,7 @@ func GetLogout(w http.ResponseWriter, r *http.Request) {
 	// redirec to the login page
 	http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 }
+
+func RedirectLogin(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+}

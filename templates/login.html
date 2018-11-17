@@ -51,7 +51,7 @@
 			data: JSON.stringify({username: username.value, password: password.value}),
 			contentType: 'application/json; charset=UTF-8'
 		}).done(function(){
-			window.location.pathname = '/'
+			window.location.pathname = '/groups'
 		}).fail(function(){
 			password.setCustomValidity("Username or password was incorrect");
 			password.reportValidity();

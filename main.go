@@ -42,6 +42,9 @@ func main() {
 	fs := http.FileServer(http.Dir("static/"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 
+	// set default route
+	r.Get("/*", routes.RedirectLogin)
+
 	// attempt to get the port from the environment
 	port := os.Getenv("PORT")
 	if port == "" {
