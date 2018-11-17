@@ -28,17 +28,43 @@ func Reboot(uuid string) error {
 		return err
 	}
 
-	result := servers.Reboot(client, machine.UUID, servers.RebootOpts{Type: servers.SoftReboot})
+	// Attempt to reboot the server and return the error
+	err = servers.Reboot(client, machine.UUID, servers.RebootOpts{Type: servers.SoftReboot}).ExtractErr()
+	if err != nil {
+		log.Println("Server: ", machine.UUID, " failed to reboot")
+		return err
+	}
 
-	// shit's trippin balls
-	return result.ErrResult.Result.Err
+	log.Println("Server: ", machine.UUID, " was rebooted")
+	return err
 }
 
 // Status takes server UUID and checks its status
-func Status(uuid string) error {
-	// TODO: Check if UUID is in database
-	// TODO: Check if server is ACTIVE
-	return nil
+func Status(uuid string) (string, error) {
+	// Check if uuid is in database
+	machine, err := machines.FindByID(uuid)
+	if err != nil {
+		return "", err
+	}
+
+	// Set openstack region name
+	opts := gophercloud.EndpointOpts{Region: os.Getenv("OS_REGION_NAME")}
+
+	// Configure client for connecting to openstack
+	client, err := openstack.NewComputeV2(provider, opts)
+	if err != nil {
+		return "", err
+	}
+
+	// Get the server object
+	server, err := servers.Get(client, machine.UUID).Extract()
+	if err != nil {
+		return "", err
+	}
+
+	// Print the status and return
+	log.Println("Server ", server.ID, " is ", server.Status)
+	return server.Status, err
 }
 
 // Init attempts to setup a connection
@@ -55,5 +81,4 @@ func Init() {
 		log.Fatal("Attempted to set provider, error: ", err)
 		return
 	}
-
 }
