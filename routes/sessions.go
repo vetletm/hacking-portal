@@ -136,9 +136,7 @@ func Init(addr, dn, courseCode, admins string) {
 
 func SessionHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/log") || strings.HasPrefix(r.URL.Path, "/static") {
-			next.ServeHTTP(w, r)
-		} else {
+		if strings.HasPrefix(r.URL.Path, "/admin") || strings.HasPrefix(r.URL.Path, "/group") {
 			c, err := r.Cookie("session_token")
 			if err != nil {
 				http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
@@ -166,6 +164,8 @@ func SessionHandler(next http.Handler) http.Handler {
 			} else {
 				http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 			}
+		} else {
+			next.ServeHTTP(w, r)
 		}
 	})
 }
