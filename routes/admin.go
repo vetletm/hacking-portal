@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -110,19 +111,28 @@ func (storage *AdminEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.
 
 // PostMachineAssign handles machine group assignment requests
 func (storage *AdminEndpoint) PostMachineAssign(w http.ResponseWriter, r *http.Request) {
-	// TODO:
-	// - assigns a machine to a group by ID
-	// - if group ID is empty, unassign the machine from any group
-	// - needs validation (just in case)
+	var payload map[string]interface{}
 
-	// var groupID int
-	// machineUUID := chi.URLParam(r, "machine")
+	// attempt to decode and validate the body contents, then get the machine information
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+	} else if groupID, ok := payload["groupID"]; !ok {
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+	} else if machineUUID, ok := payload["machineUUID"]; !ok {
+		http.Error(w, "Invalid body", http.StatusBadRequest)
+	} else if machine, err := storage.Machines.FindByID(machineUUID.(string)); err != nil {
+		http.Error(w, "Could not find machine", http.StatusNotFound)
+	} else {
+		// Set new group id
+		machine.GroupID = groupID.(int)
 
-	// if val := chi.URLParam(r, "id"); val != "" {
-	// 	groupID, _ = strconv.Atoi(chi.URLParam(r, "id"))
-	// }
-
-	fmt.Fprint(w, "OK")
+		// attempt to update the machine in database
+		if storage.Machines.Upsert(machine) != nil {
+			http.Error(w, "Could not update machine", http.StatusInternalServerError)
+		} else {
+			fmt.Fprint(w, "OK")
+		}
+	}
 }
 
 // AdminRouter sets up routing for the administration web interface
