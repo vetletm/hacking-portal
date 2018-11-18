@@ -13,8 +13,8 @@ const Navigation = `
 					<img class='rounded' src='/static/images/stock-avatar.png'/>
 				</a>
 				<div class='dropdown-menu' aria-labelledby='user-menu'>
-					<h5 class='dropdown-header'>{{.User.ID}}</h5>
-					{{if ne .User.GroupID 0}}
+					<h5 class='dropdown-header'>{{.Name}}</h5>
+					{{if ne .GroupID 0}}
 					<a class='dropdown-item leave' href='/group/leave'>Leave Group</a>
 					{{end}}
 					<a class='dropdown-item' href='/logout'>Log out</a>
