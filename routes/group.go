@@ -1,12 +1,14 @@
 package routes
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"path"
 
 	"hacking-portal/db"
 	"hacking-portal/models"
+	"hacking-portal/openstack"
 
 	"github.com/go-chi/chi"
 )
@@ -40,11 +42,9 @@ func (storage *GroupEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 	pageData := groupPageData{User: sessionUser}
 
 	// get the machines
-	// TODO: get from OpenStack
-	pageData.Machines = []models.Machine{
-		{"123", 0, 1, "10.212.136.10"},
-		{"456", 0, 2, "10.212.136.20"},
-		{"789", 0, 3, "10.212.136.30"},
+	if pageData.Machines, err = storage.Machines.FindByGroup(sessionUser.GroupID); err != nil {
+		http.Error(w, "unable to get machines", http.StatusInternalServerError)
+		return
 	}
 
 	// prepare and ensure validity of template files
@@ -65,7 +65,26 @@ func (storage *GroupEndpoint) GetMachineKey(w http.ResponseWriter, r *http.Reque
 
 // PostMachineRestart handles a group's machine restart requests
 func (storage *GroupEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.Request) {
-	// TODO
+	// get uuid from URL path
+	uuid := chi.URLParam(r, "machineUUID")
+
+	// get the user from the session (type-casted)
+	username := r.Context().Value("session_user_id").(string)
+
+	// Compare requested machine's group id to user's group id, and reboot
+	if sessionUser, err := storage.Students.FindByID(username); err != nil {
+		http.Error(w, "Invalid user session", http.StatusBadRequest)
+	} else if sessionUser.GroupID == 0 {
+		http.Error(w, "Invalid user session", http.StatusBadRequest)
+	} else if machine, err := storage.Machines.FindByID(uuid); err != nil {
+		http.Error(w, "Invalid machine", http.StatusBadRequest)
+	} else if machine.GroupID != sessionUser.GroupID {
+		http.Error(w, "Invalid machine", http.StatusBadRequest)
+	} else if openstack.Reboot(uuid) != nil {
+		http.Error(w, "Could not reboot machine", http.StatusInternalServerError)
+	} else {
+		fmt.Fprint(w, "OK")
+	}
 }
 
 // PostLeaveGroup handles group leave requests
@@ -106,8 +125,8 @@ func GroupRouter() chi.Router {
 
 	r := chi.NewRouter()
 	r.Get("/", ep.GetDashboard)
-	r.Get("/key/{machineIndex:[0-9]+}", ep.GetMachineKey)
-	r.Post("/restart/{machineIndex:[0-9]+}", ep.PostMachineRestart)
+	r.Get("/key/{machineUUID:[A-Za-z0-9-]+}", ep.GetMachineKey)
+	r.Post("/restart/{machineUUID:[A-Za-z0-9-]+}", ep.PostMachineRestart)
 	r.Get("/leave", ep.GetLeaveGroup)
 
 	return r
