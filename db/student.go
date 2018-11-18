@@ -68,7 +68,7 @@ func (StudentDatabase) FindGroups() (map[int]int, error) {
 			if _, isset := groupIDs[groupID]; !isset {
 				groupIDs[groupID] = 1
 			} else {
-				groupIDs[groupID] += 1
+				groupIDs[groupID]++
 			}
 		}
 	}
