@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"path"
 	"sort"
 
 	"hacking-portal/db"
 	"hacking-portal/models"
 	"hacking-portal/openstack"
+	"hacking-portal/templates"
 
 	"github.com/go-chi/chi"
 )
@@ -78,11 +78,7 @@ func (storage *AdminEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 	}
 
 	// prepare and ensure validity of template files
-	tpl := template.Must(template.ParseFiles(
-		path.Join("templates", "layout.html"),
-		path.Join("templates", "navigation.html"),
-		path.Join("templates", "admin.html"),
-	))
+	tpl := template.Must(template.New("layout").Parse(templates.Layout + templates.Navigation + templates.Admin))
 
 	// render the templates with data
 	tpl.ExecuteTemplate(w, "layout", pageData)
@@ -123,7 +119,7 @@ func (storage *AdminEndpoint) PostMachineAssign(w http.ResponseWriter, r *http.R
 		http.Error(w, "Could not find machine", http.StatusNotFound)
 	} else {
 		// Set new group id
-		machine.GroupID = groupID.(int)
+		machine.GroupID = int(groupID.(float64))
 
 		// attempt to update the machine in database
 		if storage.Machines.Upsert(machine) != nil {

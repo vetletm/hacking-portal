@@ -1,3 +1,6 @@
+package templates
+
+const Admin = `
 {{define "title"}}Administration{{end}}
 
 {{define "body"}}
@@ -135,3 +138,4 @@
 	});
 </script>
 {{end}}
+`

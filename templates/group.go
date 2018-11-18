@@ -1,3 +1,6 @@
+package templates
+
+const Group = `
 {{define "title"}}Group {{.User.GroupID}}{{end}}
 
 {{define "body"}}
@@ -65,3 +68,4 @@
 	});
 </script>
 {{end}}
+`

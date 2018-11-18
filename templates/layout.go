@@ -1,3 +1,6 @@
+package templates
+
+const Layout = `
 {{define "layout"}}
 <!DOCTYPE html>
 <html>
@@ -21,3 +24,4 @@
 	</body>
 </html>
 {{end}}
+`
