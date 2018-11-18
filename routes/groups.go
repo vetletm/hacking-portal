@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"reflect"
 	"sort"
 
 	"hacking-portal/db"
@@ -108,15 +109,24 @@ func (storage *GroupsEndpoint) PostJoinGroup(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var payload map[string]int
+	if sessionUser.GroupID != 0 {
+		http.Error(w, "User already in a group", http.StatusBadRequest)
+		return
+	}
+
+	var payload map[string]interface{}
 
 	// attempt to decode and validate the body contents, then get the student information
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		http.Error(w, "Invalid body", http.StatusBadRequest)
 	} else if groupID, ok := payload["groupID"]; !ok {
 		http.Error(w, "Invalid body", http.StatusBadRequest)
+	} else if reflect.TypeOf(groupID).Kind() != reflect.Float64 {
+		http.Error(w, "Invalid group ID", http.StatusBadRequest)
+	} else if groupID.(float64) <= 0 {
+		http.Error(w, "Invalid group ID", http.StatusBadRequest)
 	} else {
-		sessionUser.GroupID = groupID
+		sessionUser.GroupID = int(groupID.(float64))
 
 		// attempt to update the sessionUser's group ID
 		if err := storage.Students.Upsert(sessionUser); err != nil {
