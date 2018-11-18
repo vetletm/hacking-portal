@@ -78,6 +78,32 @@ func TestPostMachineAssign(t *testing.T) {
 	}
 }
 
+func TestAdminMachineRestart(t *testing.T) {
+	// create a request to pass to the handler
+	req := httptest.NewRequest("POST", "/", nil)
+
+	// create a response recorder to record the response from the handler
+	res := httptest.NewRecorder()
+
+	// preprare a new context
+	ctx := chi.NewRouteContext()
+	ctx.URLParams.Add("uuid", "0000")
+	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, ctx))
+
+	// prepare the endpoint with mocked storage
+	ep := AdminEndpoint{
+		Machines: new(mockMachineStorage),
+		Students: new(mockStudentStorage),
+	}
+
+	// serve the handler
+	handler := http.HandlerFunc(ep.PostMachineRestart)
+	handler.ServeHTTP(res, req)
+
+	// test the status
+	require.Equal(t, http.StatusNotFound, res.Code, "handler returned wrong status code")
+}
+
 func TestAdminRouter(t *testing.T) {
 	var r *chi.Mux
 	assert.IsType(t, r, AdminRouter())
