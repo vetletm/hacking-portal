@@ -70,12 +70,9 @@ func (storage *AdminEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
-	// get the machines
-	// TODO: get from OpenStack
-	pageData.Machines = []models.Machine{
-		{"123", 0, 1, "10.212.136.10"},
-		{"456", 0, 2, "10.212.136.20"},
-		{"789", 1, 1, "10.212.136.30"},
+	// get the machines from the database
+	if pageData.Machines, err = storage.Machines.FindAll(); err != nil {
+		http.Error(w, "unable to grab machines", http.StatusInternalServerError)
 	}
 
 	// prepare and ensure validity of template files
