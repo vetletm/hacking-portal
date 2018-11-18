@@ -1,41 +1,75 @@
 package routes
 
-import "testing"
+import (
+	"bytes"
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
-// TODO: database mocking
+	"github.com/go-chi/chi"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
-func TestAdminGetHomepage(t *testing.T) {
-	// TODO
+func TestAdminDashboard(t *testing.T) {
+	// create a request to pass to the handler
+	req := httptest.NewRequest("GET", "/", nil)
+	req = req.WithContext(context.WithValue(req.Context(), "session_user_id", "hei"))
+
+	// create a response recorder to record the response from the handler
+	res := httptest.NewRecorder()
+
+	// prepare the endpoint with mocked storage
+	ep := AdminEndpoint{
+		Machines: new(mockMachineStorage),
+		Students: new(mockStudentStorage),
+	}
+
+	// serve the handler
+	handler := http.HandlerFunc(ep.GetDashboard)
+	handler.ServeHTTP(res, req)
+
+	// test the status
+	require.Equal(t, http.StatusOK, res.Code, "handler returned wrong status code")
 }
 
-func TestAdminGetMachines(t *testing.T) {
-	// TODO
-}
+func TestPostMachineAssign(t *testing.T) {
+	testData := []struct {
+		body string
+		code int
+	}{
+		{body: ``, code: http.StatusBadRequest},
+		{body: `{"machineUUID":"0000"}`, code: http.StatusBadRequest},
+		{body: `{"groupID":0}`, code: http.StatusBadRequest},
+		{body: `{"machineUUID":"1111","groupID":1}`, code: http.StatusOK},
+		{body: `{"machineUUID":"1111","groupID":-1}`, code: http.StatusInternalServerError},
+		{body: `{"machineUUID":"0000","groupID":1}`, code: http.StatusNotFound},
+	}
 
-func TestAdminPostAssign(t *testing.T) {
-	// TODO
-}
+	for _, data := range testData {
+		// create a request to pass to the handler
+		req := httptest.NewRequest("POST", "/", bytes.NewBuffer([]byte(data.body)))
 
-func TestAdminGetTasks(t *testing.T) {
-	// TODO
-}
+		// create a response recorder to record the response from the handler
+		res := httptest.NewRecorder()
 
-func TestAdminNewTask(t *testing.T) {
-	// TODO
-}
+		// prepare the endpoint with mocked storage
+		ep := AdminEndpoint{
+			Machines: new(mockMachineStorage),
+			Students: new(mockStudentStorage),
+		}
 
-func TestAdminEditTask(t *testing.T) {
-	// TODO
-}
+		// serve the handler
+		handler := http.HandlerFunc(ep.PostMachineAssign)
+		handler.ServeHTTP(res, req)
 
-func TestAdminGetGroups(t *testing.T) {
-	// TODO
-}
-
-func TestAdminGetGroup(t *testing.T) {
-	// TODO
+		// test the status
+		require.Equal(t, data.code, res.Code, "handler returned wrong status code")
+	}
 }
 
 func TestAdminRouter(t *testing.T) {
-	// TODO
+	var r *chi.Mux
+	assert.IsType(t, r, AdminRouter())
 }
