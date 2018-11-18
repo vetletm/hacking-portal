@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"path"
 	"sort"
 
 	"hacking-portal/db"
 	"hacking-portal/models"
+	"hacking-portal/templates"
 
 	"github.com/go-chi/chi"
 )
@@ -90,11 +90,7 @@ func (storage *GroupsEndpoint) GetGroups(w http.ResponseWriter, r *http.Request)
 	})
 
 	// prepare and ensure validity of template files
-	tpl := template.Must(template.ParseFiles(
-		path.Join("templates", "layout.html"),
-		path.Join("templates", "navigation.html"),
-		path.Join("templates", "groups.html"),
-	))
+	tpl := template.Must(template.New("layout").Parse(templates.Layout + templates.Navigation + templates.Groups))
 
 	// render the templates with data
 	tpl.ExecuteTemplate(w, "layout", pageData)

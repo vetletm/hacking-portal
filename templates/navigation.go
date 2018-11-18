@@ -1,3 +1,6 @@
+package templates
+
+const Navigation = `
 {{define "navigation"}}
 <nav class='navbar navbar-fixed-top bg-secondary'>
 	<div class='container-fluid'>
@@ -20,3 +23,4 @@
 	</div>
 </nav>
 {{end}}
+`

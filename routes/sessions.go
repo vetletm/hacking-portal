@@ -8,9 +8,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"path"
 	"strings"
 	"time"
+
+	"hacking-portal/templates"
 
 	"github.com/google/uuid"
 	"gopkg.in/ldap.v2"
@@ -194,10 +195,7 @@ func SessionHandler(next http.Handler) http.Handler {
 // GetLogin routes invalid users to the login page
 func GetLogin(w http.ResponseWriter, r *http.Request) {
 	// prepare and ensure validity of template files
-	tpl := template.Must(template.ParseFiles(
-		path.Join("templates", "layout.html"),
-		path.Join("templates", "login.html"),
-	))
+	tpl := template.Must(template.New("layout").Parse(templates.Layout + templates.Login))
 
 	// render the templates
 	tpl.ExecuteTemplate(w, "layout", nil)

@@ -1,3 +1,6 @@
+package templates
+
+const Login = `
 {{define "title"}}Login{{end}}
 
 {{define "navigation"}}{{end}}
@@ -59,3 +62,4 @@
 	});
 </script>
 {{end}}
+`

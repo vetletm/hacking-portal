@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"path"
 
 	"hacking-portal/db"
 	"hacking-portal/models"
 	"hacking-portal/openstack"
+	"hacking-portal/templates"
 
 	"github.com/go-chi/chi"
 )
@@ -48,11 +48,7 @@ func (storage *GroupEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 	}
 
 	// prepare and ensure validity of template files
-	tpl := template.Must(template.ParseFiles(
-		path.Join("templates", "layout.html"),
-		path.Join("templates", "navigation.html"),
-		path.Join("templates", "group.html"),
-	))
+	tpl := template.Must(template.New("layout").Parse(templates.Layout + templates.Navigation + templates.Group))
 
 	// render the templates with data
 	tpl.ExecuteTemplate(w, "layout", pageData)
