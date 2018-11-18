@@ -7,3 +7,4 @@ Difficulties:
 
 What we'd like to do, but can't due to time:
 - Implement an admin interface where we can create, delete, reboot any server belonging to any group.
+- Add new keypairs to a server. The challenge was that Openstack's API does not allow appending a new keypair to a server without rebuilding. Which would have resulted in us going far beyond our original scope.

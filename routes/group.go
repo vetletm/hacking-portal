@@ -58,11 +58,6 @@ func (storage *GroupEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 	tpl.ExecuteTemplate(w, "layout", pageData)
 }
 
-// GetMachineKey returns the given group's machine's PEM key
-func (storage *GroupEndpoint) GetMachineKey(w http.ResponseWriter, r *http.Request) {
-	// TODO
-}
-
 // PostMachineRestart handles a group's machine restart requests
 func (storage *GroupEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.Request) {
 	// get uuid from URL path
@@ -125,7 +120,6 @@ func GroupRouter() chi.Router {
 
 	r := chi.NewRouter()
 	r.Get("/", ep.GetDashboard)
-	r.Get("/key/{machineUUID:[A-Za-z0-9-]+}", ep.GetMachineKey)
 	r.Post("/restart/{machineUUID:[A-Za-z0-9-]+}", ep.PostMachineRestart)
 	r.Get("/leave", ep.GetLeaveGroup)
 
