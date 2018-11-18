@@ -82,7 +82,7 @@ func (storage *GroupEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.
 	}
 }
 
-// PostLeaveGroup handles group leave requests
+// GetLeaveGroup handles group leave requests
 func (storage *GroupEndpoint) GetLeaveGroup(w http.ResponseWriter, r *http.Request) {
 	// get the user from the session (type-casted)
 	username := r.Context().Value("session_user_id").(string)

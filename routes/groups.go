@@ -14,8 +14,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-// Groups is an implementation of the endpoint for all Groups-related methods.
-// Database interfaces for all the methods are expected to be provided.
+// GroupsEndpoint interfaces for all the methods are expected to be provided.
 type GroupsEndpoint struct {
 	Students db.StudentStorage
 }
@@ -55,32 +54,32 @@ func (storage *GroupsEndpoint) GetGroups(w http.ResponseWriter, r *http.Request)
 	pageData := groupsPageData{User: sessionUser}
 
 	// get the groups
-	if groups, err := storage.Students.FindGroups(); err != nil {
+	groups, err := storage.Students.FindGroups()
+	if err != nil {
 		http.Error(w, "Unable to get groups", http.StatusInternalServerError)
 		return
-	} else {
-		// maps are intentionally randomized in order, so we have to get an ordered slice of it
-		var groupKeys []int
-		for key := range groups {
-			groupKeys = append(groupKeys, key)
-		}
-		sort.Ints(groupKeys)
+	}
+	// maps are intentionally randomized in order, so we have to get an ordered slice of it
+	var groupKeys []int
+	for key := range groups {
+		groupKeys = append(groupKeys, key)
+	}
+	sort.Ints(groupKeys)
 
-		// iterate over each group and fill in the page data
-		for _, groupID := range groupKeys {
-			numMembers := groups[groupID]
+	// iterate over each group and fill in the page data
+	for _, groupID := range groupKeys {
+		numMembers := groups[groupID]
 
-			// get all group members
-			if groupMembers, err := storage.Students.FindByGroup(groupID); err != nil {
-				http.Error(w, "Unable to parse groups", http.StatusInternalServerError)
-			} else {
-				// append the group data and members to the page data
-				pageData.Groups = append(pageData.Groups, models.Group{
-					ID:      groupID,
-					Full:    numMembers == 3, // hardcode much
-					Members: groupMembers,
-				})
-			}
+		// get all group members
+		if groupMembers, err := storage.Students.FindByGroup(groupID); err != nil {
+			http.Error(w, "Unable to parse groups", http.StatusInternalServerError)
+		} else {
+			// append the group data and members to the page data
+			pageData.Groups = append(pageData.Groups, models.Group{
+				ID:      groupID,
+				Full:    numMembers == 3, // hardcode much
+				Members: groupMembers,
+			})
 		}
 	}
 

@@ -31,11 +31,15 @@ type Credentials struct {
 
 // SessionType stores if user is student, admin, or invalid
 type SessionType int
+type contextKey string
 
+// Const values for each type of user
 const (
 	StudentUser SessionType = 1
 	AdminUser   SessionType = 2
 	InvalidUser SessionType = 0
+
+	contextKeyUserID contextKey = "session_user_id"
 )
 
 // AuthenticationMiddleware keeps a map of authenticated users
@@ -47,6 +51,7 @@ type AuthenticationMiddleware struct {
 	GroupFilter string
 }
 
+// ValidateUser checks if user exists in LDAP
 func (amw *AuthenticationMiddleware) ValidateUser(creds Credentials) (SessionType, error) {
 	// create a connection to LDAP
 	conn, err := ldap.Dial("tcp", fmt.Sprintf("%s:%d", amw.LDAPAddress, 389))
@@ -98,6 +103,7 @@ func (amw *AuthenticationMiddleware) ValidateUser(creds Credentials) (SessionTyp
 	return InvalidUser, nil
 }
 
+// ValidateSession checks if session exists for a given user
 func (amw *AuthenticationMiddleware) ValidateSession(token string) (SessionType, string) {
 	session, found := amw.TokenUsers[token]
 	if !found {
@@ -108,6 +114,7 @@ func (amw *AuthenticationMiddleware) ValidateSession(token string) (SessionType,
 
 var amw = AuthenticationMiddleware{}
 
+// InitAuthentication sets required values for LDAP connection
 func InitAuthentication(addr, dn, courseCode, admins string) {
 	if addr == "" {
 		log.Fatal("LDAP address must be provided")
@@ -134,6 +141,7 @@ func InitAuthentication(addr, dn, courseCode, admins string) {
 	amw.GroupFilter = fmt.Sprintf("(cn=fs_%s_1)", courseCode)
 }
 
+// SessionHandler checks for a session and handles it accordingly
 func SessionHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/admin") || strings.HasPrefix(r.URL.Path, "/group") {
@@ -158,7 +166,7 @@ func SessionHandler(next http.Handler) http.Handler {
 			}
 
 			// inject userID into request context
-			r = r.WithContext(context.WithValue(r.Context(), "session_user_id", userID))
+			r = r.WithContext(context.WithValue(r.Context(), contextKeyUserID, userID))
 
 			if path != "" {
 				// refresh the cookie
@@ -183,6 +191,7 @@ func SessionHandler(next http.Handler) http.Handler {
 	})
 }
 
+// GetLogin routes invalid users to the login page
 func GetLogin(w http.ResponseWriter, r *http.Request) {
 	// prepare and ensure validity of template files
 	tpl := template.Must(template.ParseFiles(
@@ -194,6 +203,7 @@ func GetLogin(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "layout", nil)
 }
 
+// PostLogin validates the user and creates session
 func PostLogin(w http.ResponseWriter, r *http.Request) {
 	var creds Credentials
 	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
@@ -227,6 +237,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "OK")
 }
 
+// GetLogout handles user logouts
 func GetLogout(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("session_token")
 	if err != nil || c.Value == "" {
@@ -250,6 +261,7 @@ func GetLogout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 }
 
+// RedirectLogin sends the user to the login page
 func RedirectLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 }

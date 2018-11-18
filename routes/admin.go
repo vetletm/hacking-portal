@@ -52,22 +52,23 @@ func (storage *AdminEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 	pageData := adminPageData{User: sessionUser}
 
 	// get the groups
-	if groups, err := storage.Students.FindGroups(); err != nil {
+	groups, err := storage.Students.FindGroups()
+	if err != nil {
 		http.Error(w, "Unable to get groups", http.StatusInternalServerError)
 		return
-	} else {
-		// maps are intentionally randomized in order, so we have to get an ordered slice of it
-		var groupKeys []int
-		for key := range groups {
-			groupKeys = append(groupKeys, key)
-		}
-		sort.Ints(groupKeys)
+	}
 
-		// iterate over each group and fill in the page data
-		for _, groupID := range groupKeys {
-			// append the group data and members to the page data
-			pageData.Groups = append(pageData.Groups, models.Group{ID: groupID})
-		}
+	// maps are intentionally randomized in order, so we have to get an ordered slice of it
+	var groupKeys []int
+	for key := range groups {
+		groupKeys = append(groupKeys, key)
+	}
+	sort.Ints(groupKeys)
+
+	// iterate over each group and fill in the page data
+	for _, groupID := range groupKeys {
+		// append the group data and members to the page data
+		pageData.Groups = append(pageData.Groups, models.Group{ID: groupID})
 	}
 
 	// get the machines from the database
@@ -87,7 +88,7 @@ func (storage *AdminEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 	tpl.ExecuteTemplate(w, "layout", pageData)
 }
 
-// PostMachineAssign handles machine restart requests
+// PostMachineRestart handles machine restart requests
 func (storage *AdminEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.Request) {
 	// get machine UUID from URL path
 	uuid := chi.URLParam(r, "machineUUID")
