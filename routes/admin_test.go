@@ -16,7 +16,7 @@ import (
 func TestAdminDashboard(t *testing.T) {
 	// create a request to pass to the handler
 	req := httptest.NewRequest("GET", "/", nil)
-	req = req.WithContext(context.WithValue(req.Context(), "session_user_id", "hei"))
+	req = req.WithContext(context.WithValue(req.Context(), contextKey, "hei"))
 
 	// create a response recorder to record the response from the handler
 	res := httptest.NewRecorder()

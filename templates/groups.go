@@ -1,5 +1,6 @@
 package templates
 
+// Groups HTML template
 const Groups = `
 {{define "title"}}Groups{{end}}
 

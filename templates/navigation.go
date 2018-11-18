@@ -1,5 +1,6 @@
 package templates
 
+// Navigation HTML template
 const Navigation = `
 {{define "navigation"}}
 <nav class='navbar navbar-fixed-top bg-secondary'>
