@@ -57,6 +57,22 @@ func Status(uuid string) (string, error) {
 	return server.Status, err
 }
 
+// getFloating find the floating IP and returns it
+func getFloating(server servers.Server) string {
+	// Iterate through Addresses until floating is found
+	for _, networkAddresses := range server.Addresses {
+		for _, element := range networkAddresses.([]interface{}) {
+			address := element.(map[string]interface{})
+
+			if address["OS-EXT-IPS:type"] == "floating" {
+				return address["addr"].(string)
+			}
+		}
+	}
+	// If nothing was found
+	return ""
+}
+
 // Init attempts to setup a connection
 func Init() {
 	// source options from environment
@@ -98,8 +114,9 @@ func Init() {
 		if strings.HasPrefix(strings.ToLower(server.Name), "kali") {
 			// machine exists, update in database
 			if err := machines.Upsert(models.Machine{
-				Name: server.Name,
-				UUID: server.ID,
+				Name:    server.Name,
+				UUID:    server.ID,
+				Address: getFloating(server),
 			}); err != nil {
 				log.Fatal("Attempted to insert new machine into db, error:", err)
 				return
