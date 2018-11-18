@@ -30,15 +30,16 @@ type adminPageData struct {
 
 // GetDashboard renders a view of the administration interface
 func (storage *AdminEndpoint) GetDashboard(w http.ResponseWriter, r *http.Request) {
-	// get the user from the session (type-casted)
-	username := r.Context().Value("session_user_id").(string)
+	// get the user from the session
+	cookie, _ := r.Cookie("session_token")
+	session := sessions[cookie.Value]
 
 	// get the actual sessionUser object from the username
-	sessionUser, err := storage.Students.FindByID(username)
+	sessionUser, err := storage.Students.FindByID(session.Username)
 	if err != nil {
 		// sessionUser doesn't exist yet, we'll have to create it
 		// this will happen on first visit
-		sessionUser = models.Student{ID: username}
+		sessionUser = models.Student{ID: session.Username, Name: session.DisplayName}
 
 		err = storage.Students.Upsert(sessionUser)
 		if err != nil {

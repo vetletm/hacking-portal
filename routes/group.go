@@ -27,11 +27,12 @@ type groupPageData struct {
 
 // GetDashboard renders a view of the group interface
 func (storage *GroupEndpoint) GetDashboard(w http.ResponseWriter, r *http.Request) {
-	// get the user from the session (type-casted)
-	username := r.Context().Value("session_user_id").(string)
+	// get the user from the session
+	cookie, _ := r.Cookie("session_token")
+	session := sessions[cookie.Value]
 
 	// get the actual sessionUser object from the username
-	sessionUser, err := storage.Students.FindByID(username)
+	sessionUser, err := storage.Students.FindByID(session.Username)
 	if err != nil || sessionUser.GroupID == 0 {
 		// sessionUser doesn't exist or has no group affiliation, redirect em'
 		http.Redirect(w, r, "/groups", http.StatusTemporaryRedirect)
@@ -56,14 +57,15 @@ func (storage *GroupEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 
 // PostMachineRestart handles a group's machine restart requests
 func (storage *GroupEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.Request) {
+	// get the user from the session
+	cookie, _ := r.Cookie("session_token")
+	session := sessions[cookie.Value]
+
 	// get uuid from URL path
 	uuid := chi.URLParam(r, "machineUUID")
 
-	// get the user from the session (type-casted)
-	username := r.Context().Value("session_user_id").(string)
-
 	// Compare requested machine's group id to user's group id, and reboot
-	if sessionUser, err := storage.Students.FindByID(username); err != nil {
+	if sessionUser, err := storage.Students.FindByID(session.Username); err != nil {
 		http.Error(w, "Invalid user session", http.StatusBadRequest)
 	} else if sessionUser.GroupID == 0 {
 		http.Error(w, "Invalid user session", http.StatusBadRequest)
@@ -80,11 +82,12 @@ func (storage *GroupEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.
 
 // GetLeaveGroup handles group leave requests
 func (storage *GroupEndpoint) GetLeaveGroup(w http.ResponseWriter, r *http.Request) {
-	// get the user from the session (type-casted)
-	username := r.Context().Value("session_user_id").(string)
+	// get the user from the session
+	cookie, _ := r.Cookie("session_token")
+	session := sessions[cookie.Value]
 
 	// attempt to get the student information, validating it
-	if student, err := storage.Students.FindByID(username); err != nil {
+	if student, err := storage.Students.FindByID(session.Username); err != nil {
 		http.Error(w, "Unable to get student data", http.StatusBadRequest)
 	} else if student.GroupID == 0 {
 		http.Error(w, "Student is not in a group", http.StatusBadRequest)
