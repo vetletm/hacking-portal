@@ -44,7 +44,7 @@ func (s mockStudentStorage) FindByGroup(groupID int) ([]models.Student, error) {
 		}
 	}
 
-	return students, errors.New("")
+	return students, nil
 }
 
 func (s mockStudentStorage) FindGroups() (map[int]int, error) {
@@ -68,7 +68,6 @@ func (s *mockStudentStorage) Upsert(student models.Student) error {
 		s.data = map[string]models.Student{}
 	}
 
-	student.GroupID = 0
 	s.data[student.ID] = student
 	return nil
 }
