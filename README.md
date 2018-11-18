@@ -1,5 +1,7 @@
 # Hacking Portal
 
+[![Coverage Status](https://coveralls.io/repos/github/vetletm/hacking-portal/badge.svg?branch=master)](https://coveralls.io/github/vetletm/hacking-portal?branch=master)
+
 This project deploys a web interface to manage and assign Kali VMs in a lab environment used for the Ethical Hacking project in the IMT3004 course at NTNU Gjøvik. It allows an admin (lecturer) to assign up to three Kali VMs to each group of students, and it allows students to restart their assigned VMs without having access to the OpenStack environment in where they are hosted. This was originally a part of the PEMA bachelor assignment for the class of '16.
 
 The original scope was to authenticate using LDAP and NTNU's own authentication infrastructure, integrate with OpenStack for VM assignments and management, store intermediate information in a MongoDB database, all of which hosted in a Docker Swarm on VMs in NTNU's own OpenStack environment. The scope also included a tasks/answers interface, as well as sessions stored in the database, but time didn't allow it.
@@ -17,6 +19,8 @@ Difficulties:
 	- Documentation on this was not easy to come by
 - We also had some issues (initially) with the OpenStack package for Go
 	- Documentation was outdated and the package was very complex, but it was the only option
+- Adding tests for OpenStack and LDAP libraries deemed to be unfeasible
+	- We settled for testing our own original code
 
 What could be improved:
 - Further developing the application to include more of the specs from the original assignment (PEMA)
