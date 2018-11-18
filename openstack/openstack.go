@@ -3,8 +3,10 @@ package openstack
 import (
 	"log"
 	"os"
+	"strings"
 
 	"hacking-portal/db"
+	"hacking-portal/models"
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
@@ -57,23 +59,51 @@ func Status(uuid string) (string, error) {
 
 // Init attempts to setup a connection
 func Init() {
-	AuthOpts, err := openstack.AuthOptionsFromEnv()
+	// source options from environment
+	authOpts, err := openstack.AuthOptionsFromEnv()
 	if err != nil {
 		log.Fatal("Attempted to set authoptions, error: ", err)
-		return
 	}
-	AuthOpts.DomainName = os.Getenv("OS_USER_DOMAIN_NAME")
+	authOpts.DomainName = os.Getenv("OS_USER_DOMAIN_NAME")
 
-	provider, err := openstack.AuthenticatedClient(AuthOpts)
+	// authenticate with the OpenStack API
+	provider, err := openstack.AuthenticatedClient(authOpts)
 	if err != nil {
 		log.Fatal("Attempted to set provider, error: ", err)
-		return
 	}
 
-	opts := gophercloud.EndpointOpts{Region: os.Getenv("OS_REGION_NAME")}
+	// grab a new compute client
+	if client, err = openstack.NewComputeV2(provider, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	}); err != nil {
+		log.Fatal("Failed to initialize OpenStack client", err)
+	}
 
-	client, err = openstack.NewComputeV2(provider, opts)
+	// grab a list of servers, which is paginated
+	allPages, err := servers.List(client, servers.ListOpts{
+		AllTenants: true,
+	}).AllPages()
 	if err != nil {
-		return
+		log.Fatal("Failed to get server list from OpenStack", err)
+	}
+
+	// get all the servers from the paginated list
+	allServers, err := servers.ExtractServers(allPages)
+	if err != nil {
+		log.Fatal("Failed to get all servers from OpenStack", err)
+	}
+
+	// iterate through all servers and attempt to put them into the database
+	for _, server := range allServers {
+		if strings.HasPrefix(strings.ToLower(server.Name), "kali") {
+			// machine exists, update in database
+			if err := machines.Upsert(models.Machine{
+				Name: server.Name,
+				UUID: server.ID,
+			}); err != nil {
+				log.Fatal("Attempted to insert new machine into db, error:", err)
+				return
+			}
+		}
 	}
 }
