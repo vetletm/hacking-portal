@@ -15,7 +15,7 @@ const Layout = `
 		<link rel='stylesheet' href='/static/css/tweaks.css'>
 	</head>
 	<body>
-		{{template "navigation" .}}
+		{{template "navigation" .User}}
 		{{template "body" .}}
 
 		<script src='/static/js/libs/jquery.min.js'></script>

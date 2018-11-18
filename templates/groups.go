@@ -26,8 +26,11 @@ const Groups = `
 				<h6 class='card-text m-1'>Members:</h6>
 				<ul>
 				{{range .Members}}
-					<!-- <li class='card-text m-1'>{{.Name}}</li> -->
+					{{if .Name}}
+					<li class='card-text m-1'>{{.Name}}</li>
+					{{else}}
 					<li class='card-text m-1'>{{.ID}}</li>
+					{{end}}
 				{{end}}
 				</ul>
 			{{else}}
