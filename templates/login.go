@@ -1,5 +1,6 @@
 package templates
 
+// Login HTML template
 const Login = `
 {{define "title"}}Login{{end}}
 

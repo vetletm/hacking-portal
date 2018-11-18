@@ -1,5 +1,6 @@
 package templates
 
+// Layout HTML template
 const Layout = `
 {{define "layout"}}
 <!DOCTYPE html>

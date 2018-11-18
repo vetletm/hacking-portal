@@ -1,5 +1,6 @@
 package templates
 
+// Admin HTML template
 const Admin = `
 {{define "title"}}Administration{{end}}
 

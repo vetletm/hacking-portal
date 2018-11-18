@@ -35,7 +35,7 @@ func TestGroupDashboard(t *testing.T) {
 	for _, data := range testData {
 		// create a request to pass to the handler
 		req := httptest.NewRequest("GET", "/", nil)
-		req = req.WithContext(context.WithValue(req.Context(), "session_user_id", data.user))
+		req = req.WithContext(context.WithValue(req.Context(), contextKey, data.user))
 
 		// create a response recorder to record the response from the handler
 		res := httptest.NewRecorder()
@@ -82,7 +82,7 @@ func TestGroupMachineRestart(t *testing.T) {
 	for _, data := range testData {
 		// create a request to pass to the handler
 		req := httptest.NewRequest("POST", "/", nil)
-		req = req.WithContext(context.WithValue(req.Context(), "session_user_id", data.user))
+		req = req.WithContext(context.WithValue(req.Context(), contextKey, data.user))
 
 		// create a response recorder to record the response from the handler
 		res := httptest.NewRecorder()
@@ -124,7 +124,7 @@ func TestGetLeaveGroup(t *testing.T) {
 	for _, data := range testData {
 		// create a request to pass to the handler
 		req := httptest.NewRequest("POST", "/", nil)
-		req = req.WithContext(context.WithValue(req.Context(), "session_user_id", data.user))
+		req = req.WithContext(context.WithValue(req.Context(), contextKey, data.user))
 
 		// create a response recorder to record the response from the handler
 		res := httptest.NewRecorder()

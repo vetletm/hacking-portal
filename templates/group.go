@@ -1,5 +1,6 @@
 package templates
 
+// Group HTML template
 const Group = `
 {{define "title"}}Group {{.User.GroupID}}{{end}}
 
