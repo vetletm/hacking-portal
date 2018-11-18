@@ -18,9 +18,6 @@
 						<a class='btn btn-sm btn-outline-default border restart' href='#' data-toggle='tooltip' title='Restart'>
 							<span class='fas fa-redo' aria-hidden='true'></span>
 						</a>
-						<a class='btn btn-sm btn-outline-default border pem-key' href='#' data-toggle='tooltip' title='PEM'>
-							<span class='fas fa-file-download' aria-hidden='true'></span>
-						</a>
 					</span>
 				</div>
 			{{end}}
@@ -65,18 +62,6 @@
 				button.children().removeClass('fa-spin');
 			}, 60 * 1000);
 		}
-	});
-	$('a.pem-key').click(function(){
-		var button = $(this);
-		var machineID = button.parent().data('kali-index');
-
-		// attempt to download the machine's key
-		$.ajax({
-			type: 'GET',
-			url: '/group/key/' + machineIndex
-		}).done({
-			// TODO: download it for the user in the client
-		})
 	});
 </script>
 {{end}}
