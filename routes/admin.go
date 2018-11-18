@@ -9,6 +9,7 @@ import (
 
 	"hacking-portal/db"
 	"hacking-portal/models"
+	"hacking-portal/openstack"
 
 	"github.com/go-chi/chi"
 )
@@ -89,11 +90,22 @@ func (storage *AdminEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 
 // PostMachineAssign handles machine restart requests
 func (storage *AdminEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.Request) {
-	// TODO:
+	// get machine UUID from URL path
+	uuid := chi.URLParam(r, "uuid")
+
 	// - lists machines and their assigned groups
-	//   - the assigned group is a dropdown that defaults to nothing
-	//   - "assign" button next to the dropdown when a change is staged
-	// - have some sorting? (machines/groups)
+	if _, err := storage.Machines.FindByID(uuid); err != nil {
+		http.Error(w, "Couldn't get machines from db", http.StatusNotFound)
+		return
+	}
+
+	// Attempt to reboot the server
+	if openstack.Reboot(uuid) != nil {
+		http.Error(w, "Failed to reboot machine", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprint(w, "OK")
 }
 
 // PostMachineAssign handles machine group assignment requests
