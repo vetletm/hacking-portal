@@ -33,7 +33,7 @@ func (s mockMachineStorage) FindByGroup(groupID int) ([]models.Machine, error) {
 		}
 	}
 
-	return machines, errors.New("")
+	return machines, nil
 }
 
 func (s *mockMachineStorage) Upsert(machine models.Machine) error {

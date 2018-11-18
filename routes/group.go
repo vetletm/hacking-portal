@@ -83,16 +83,9 @@ func (storage *GroupEndpoint) GetLeaveGroup(w http.ResponseWriter, r *http.Reque
 	// get the user from the session (type-casted)
 	username := r.Context().Value("session_user_id").(string)
 
-	// get the actual sessionUser object from the username
-	sessionUser, err := storage.Students.FindByID(username)
-	if err != nil {
-		http.Error(w, "Invalid user session", http.StatusBadRequest)
-		return
-	}
-
 	// attempt to get the student information, validating it
-	if student, err := storage.Students.FindByID(sessionUser.ID); err != nil {
-		http.Error(w, "Unable to get student data", http.StatusInternalServerError)
+	if student, err := storage.Students.FindByID(username); err != nil {
+		http.Error(w, "Unable to get student data", http.StatusBadRequest)
 	} else if student.GroupID == 0 {
 		http.Error(w, "Student is not in a group", http.StatusBadRequest)
 	} else {
