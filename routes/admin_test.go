@@ -3,6 +3,7 @@ package routes
 import (
 	"bytes"
 	"context"
+	"hacking-portal/models"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -35,6 +36,14 @@ func TestAdminDashboard(t *testing.T) {
 }
 
 func TestPostMachineAssign(t *testing.T) {
+	mdb := new(mockMachineStorage)
+	mdb.Upsert(models.Machine{
+		Name:    "test1",
+		UUID:    "1111",
+		GroupID: 1,
+		Address: "1.1.1.1",
+	})
+
 	testData := []struct {
 		body string
 		code int
@@ -56,7 +65,7 @@ func TestPostMachineAssign(t *testing.T) {
 
 		// prepare the endpoint with mocked storage
 		ep := AdminEndpoint{
-			Machines: new(mockMachineStorage),
+			Machines: mdb,
 			Students: new(mockStudentStorage),
 		}
 
