@@ -10,6 +10,34 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func mockSession(user string, valid bool) http.Cookie {
+	if sessions == nil {
+		sessions = make(map[string]Session)
+	}
+
+	if !valid {
+		return http.Cookie{
+			Name:    "session_token",
+			Value:   user,
+			Expires: time.Now(),
+		}
+	}
+
+	expiration := time.Now().Add(time.Minute)
+	cookie := http.Cookie{
+		Name:    "session_token",
+		Value:   user,
+		Expires: expiration,
+	}
+
+	sessions[user] = Session{
+		Username: user,
+		Expires:  expiration,
+	}
+
+	return cookie
+}
+
 func TestGetLogin(t *testing.T) {
 	// create a request to pass to the handler
 	req := httptest.NewRequest("GET", "/", nil)

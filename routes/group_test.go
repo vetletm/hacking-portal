@@ -25,17 +25,17 @@ func TestGroupDashboard(t *testing.T) {
 	})
 
 	testData := []struct {
-		user string
-		code int
+		cookie http.Cookie
+		code   int
 	}{
-		{user: "test", code: http.StatusTemporaryRedirect},
-		{user: "actual", code: http.StatusOK},
+		{cookie: mockSession("test", false), code: http.StatusTemporaryRedirect},
+		{cookie: mockSession("actual", true), code: http.StatusOK},
 	}
 
 	for _, data := range testData {
 		// create a request to pass to the handler
 		req := httptest.NewRequest("GET", "/", nil)
-		req = req.WithContext(context.WithValue(req.Context(), contextKey, data.user))
+		req.AddCookie(&data.cookie)
 
 		// create a response recorder to record the response from the handler
 		res := httptest.NewRecorder()
@@ -69,20 +69,20 @@ func TestGroupMachineRestart(t *testing.T) {
 	sdb.Upsert(models.Student{"grouped", "Grouped User", 1})
 
 	testData := []struct {
-		uuid string
-		code int
-		user string
+		uuid   string
+		code   int
+		cookie http.Cookie
 	}{
-		{uuid: "", code: http.StatusBadRequest, user: "invalid"},
-		{uuid: "", code: http.StatusBadRequest, user: "ungrouped"},
-		{uuid: "0000", code: http.StatusBadRequest, user: "grouped"},
-		{uuid: "1111", code: http.StatusBadRequest, user: "grouped"},
+		{uuid: "", code: http.StatusBadRequest, cookie: mockSession("invalid", false)},
+		{uuid: "", code: http.StatusBadRequest, cookie: mockSession("ungrouped", true)},
+		{uuid: "0000", code: http.StatusBadRequest, cookie: mockSession("grouped", true)},
+		{uuid: "1111", code: http.StatusBadRequest, cookie: mockSession("grouped", true)},
 	}
 
 	for _, data := range testData {
 		// create a request to pass to the handler
 		req := httptest.NewRequest("POST", "/", nil)
-		req = req.WithContext(context.WithValue(req.Context(), contextKey, data.user))
+		req.AddCookie(&data.cookie)
 
 		// create a response recorder to record the response from the handler
 		res := httptest.NewRecorder()
@@ -113,18 +113,18 @@ func TestGetLeaveGroup(t *testing.T) {
 	sdb.Upsert(models.Student{"grouped", "Grouped User", 1})
 
 	testData := []struct {
-		code int
-		user string
+		code   int
+		cookie http.Cookie
 	}{
-		{code: http.StatusBadRequest, user: "invalid"},
-		{code: http.StatusBadRequest, user: "ungrouped"},
-		{code: http.StatusTemporaryRedirect, user: "grouped"},
+		{code: http.StatusBadRequest, cookie: mockSession("invalid", false)},
+		{code: http.StatusBadRequest, cookie: mockSession("ungrouped", true)},
+		{code: http.StatusTemporaryRedirect, cookie: mockSession("grouped", true)},
 	}
 
 	for _, data := range testData {
 		// create a request to pass to the handler
 		req := httptest.NewRequest("POST", "/", nil)
-		req = req.WithContext(context.WithValue(req.Context(), contextKey, data.user))
+		req.AddCookie(&data.cookie)
 
 		// create a response recorder to record the response from the handler
 		res := httptest.NewRecorder()

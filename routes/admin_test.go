@@ -14,8 +14,11 @@ import (
 )
 
 func TestAdminDashboard(t *testing.T) {
+	cookie := mockSession("test", true)
+
 	// create a request to pass to the handler
 	req := httptest.NewRequest("GET", "/", nil)
+	req.AddCookie(&cookie)
 
 	// create a response recorder to record the response from the handler
 	res := httptest.NewRecorder()
