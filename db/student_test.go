@@ -14,11 +14,11 @@ func TestStudentUpsert(t *testing.T) {
 
 	var err error
 	// attempt to insert a few students, asserting the output
-	err = tdb.Upsert(models.Student{1, 10, "One One", "one"})
+	err = tdb.Upsert(models.Student{"one", "One One", 10})
 	require.Nil(t, err, "failed to insert student 1")
-	err = tdb.Upsert(models.Student{2, 0, "Two Two", "two"})
+	err = tdb.Upsert(models.Student{"two", "Two Two", 0})
 	require.Nil(t, err, "failed to insert student 2")
-	err = tdb.Upsert(models.Student{3, 10, "Three Three", "three"})
+	err = tdb.Upsert(models.Student{"three", "Three Three", 10})
 	require.Nil(t, err, "failed to insert student 3")
 }
 
@@ -39,29 +39,13 @@ func TestStudentFindByID(t *testing.T) {
 	tdb := StudentDatabase{}
 
 	// attempt to find student by ID
-	student, err := tdb.FindByID(1) // from the Upsert test
+	student, err := tdb.FindByID("one") // from the Upsert test
 
 	// assert output
 	require.Nil(t, err, "failed to get student")
-	require.EqualValues(t, 1, student.ID)
+	require.EqualValues(t, "one", student.ID)
 	require.EqualValues(t, 10, student.GroupID)
 	require.EqualValues(t, "One One", student.Name)
-	require.EqualValues(t, "one", student.Alias)
-}
-
-func TestStudentFindByAlias(t *testing.T) {
-	// new database type
-	tdb := StudentDatabase{}
-
-	// attempt to find student by alias
-	student, err := tdb.FindByAlias("two") // from the Upsert test
-
-	// assert output
-	require.Nil(t, err, "failed to get student")
-	require.EqualValues(t, 2, student.ID)
-	require.EqualValues(t, 0, student.GroupID)
-	require.EqualValues(t, "Two Two", student.Name)
-	require.EqualValues(t, "two", student.Alias)
 }
 
 func TestStudentFindByName(t *testing.T) {
@@ -73,10 +57,9 @@ func TestStudentFindByName(t *testing.T) {
 
 	// assert output
 	require.Nil(t, err, "failed to get student")
-	require.EqualValues(t, 3, student.ID)
+	require.EqualValues(t, "three", student.ID)
 	require.EqualValues(t, 10, student.GroupID)
 	require.EqualValues(t, "Three Three", student.Name)
-	require.EqualValues(t, "three", student.Alias)
 }
 
 func TestStudentFindByGroup(t *testing.T) {

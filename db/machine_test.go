@@ -13,7 +13,11 @@ func TestMachineUpsert(t *testing.T) {
 	tdb := MachineDatabase{}
 
 	// attempt to insert
-	err := tdb.Upsert(models.Machine{"1234", "foo", 1})
+	err := tdb.Upsert(models.Machine{
+		UUID:    "1234",
+		Name:    "foo",
+		GroupID: 1,
+	})
 
 	// assert output
 	require.Nil(t, err, "failed to insert machine")
