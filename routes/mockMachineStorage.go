@@ -9,28 +9,6 @@ type mockMachineStorage struct {
 	data map[string]models.Machine
 }
 
-func injectMachines(s *mockMachineStorage) {
-	s.data = map[string]models.Machine{}
-	s.data["1111"] = models.Machine{
-		Name:    "test1",
-		UUID:    "1111",
-		GroupID: 1,
-		Address: "1.1.1.1",
-	}
-	s.data["2222"] = models.Machine{
-		Name:    "test2",
-		UUID:    "2222",
-		GroupID: 2,
-		Address: "2.2.2.2",
-	}
-	s.data["3333"] = models.Machine{
-		Name:    "test2",
-		UUID:    "3333",
-		GroupID: 3,
-		Address: "3.3.3.3",
-	}
-}
-
 func (s mockMachineStorage) FindAll() ([]models.Machine, error) {
 	machines := make([]models.Machine, 0, len(s.data))
 	for _, machine := range s.data {
@@ -40,7 +18,6 @@ func (s mockMachineStorage) FindAll() ([]models.Machine, error) {
 }
 
 func (s *mockMachineStorage) FindByID(uuid string) (models.Machine, error) {
-	injectMachines(s)
 	var m models.Machine
 	if machine, ok := s.data[uuid]; ok {
 		return machine, nil
