@@ -73,6 +73,7 @@ func (storage *AdminEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 	// get the machines from the database
 	if pageData.Machines, err = storage.Machines.FindAll(); err != nil {
 		http.Error(w, "unable to grab machines", http.StatusInternalServerError)
+		return
 	}
 
 	// prepare and ensure validity of template files
@@ -89,7 +90,7 @@ func (storage *AdminEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 // PostMachineAssign handles machine restart requests
 func (storage *AdminEndpoint) PostMachineRestart(w http.ResponseWriter, r *http.Request) {
 	// get machine UUID from URL path
-	uuid := chi.URLParam(r, "uuid")
+	uuid := chi.URLParam(r, "machineUUID")
 
 	// - lists machines and their assigned groups
 	if _, err := storage.Machines.FindByID(uuid); err != nil {
