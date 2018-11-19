@@ -13,14 +13,12 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
 )
 
-// For accessing methods on machines database
-var machines *db.MachineDatabase
-
 // For connecting to openstack
 var client *gophercloud.ServiceClient
 
 // Reboot takes server UUID and attempts to reboot it
 func Reboot(uuid string) error {
+	machines := new(db.MachineDatabase)
 	// Check if uuid is in database
 	_, err := machines.FindByID(uuid)
 	if err != nil {
@@ -40,6 +38,7 @@ func Reboot(uuid string) error {
 
 // Status takes server UUID and checks its status
 func Status(uuid string) (string, error) {
+	machines := new(db.MachineDatabase)
 	// Check if uuid is in database
 	_, err := machines.FindByID(uuid)
 	if err != nil {
@@ -75,6 +74,8 @@ func getFloating(server servers.Server) string {
 
 // Init attempts to setup a connection
 func Init() {
+	machines := new(db.MachineDatabase)
+
 	// source options from environment
 	authOpts, err := openstack.AuthOptionsFromEnv()
 	if err != nil {
@@ -96,9 +97,7 @@ func Init() {
 	}
 
 	// grab a list of servers, which is paginated
-	allPages, err := servers.List(client, servers.ListOpts{
-		AllTenants: true,
-	}).AllPages()
+	allPages, err := servers.List(client, servers.ListOpts{}).AllPages()
 	if err != nil {
 		log.Fatal("Failed to get server list from OpenStack", err)
 	}
