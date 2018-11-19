@@ -43,7 +43,7 @@ func main() {
 	r.Mount("/admin", routes.AdminRouter())
 
 	// serve static files directly
-	fs := http.FileServer(http.Dir("static/"))
+	fs := http.FileServer(http.Dir("/var/www/static/"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 
 	// set default route
