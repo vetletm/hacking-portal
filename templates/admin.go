@@ -9,7 +9,7 @@ const Admin = `
 {{$groups := .Groups}}
 <div class='container w-50'>
 	<header class='m-5'>
-		<h1>Group {{.User.GroupID}}</h1>
+		<h1>Administration</h1>
 	</header>
 
 	<div class='d-flex flex-column'>
@@ -19,7 +19,8 @@ const Admin = `
 			<div class='list-group pb-2'>
 				{{range $machine := $machines}}
 				<div class='list-group-item clearfix' id='{{$machine.UUID}}'>
-					<a class='float-left' href='#'>{{$machine.Address}}</a>
+					<span class='float-left'>{{$machine.Name}}</span>
+					<a class='float-left pl-3' href='#'>{{$machine.Address}}</a>
 					<span class='float-left pl-3'>-></span>
 					<div class='float-left pl-4 dropdown'>
 						<button class='btn btn-sm btn-light dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
