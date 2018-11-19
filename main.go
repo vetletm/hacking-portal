@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"hacking-portal/db"
+	"hacking-portal/openstack"
 	"hacking-portal/routes"
 
 	"github.com/go-chi/chi"
@@ -25,6 +26,9 @@ func main() {
 		os.Getenv("LDAP_DC"),
 		os.Getenv("COURSE_CODE"),
 		os.Getenv("ADMINS"))
+
+	// initialize openstack connection
+	openstack.Init()
 
 	// set up routing
 	r := chi.NewRouter()
