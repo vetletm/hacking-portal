@@ -25,6 +25,16 @@ func (s *mockMachineStorage) FindByID(uuid string) (models.Machine, error) {
 	return m, errors.New("")
 }
 
+func (s *mockMachineStorage) FindByName(name string) (models.Machine, error) {
+	var m models.Machine
+	for _, machine := range s.data {
+		if machine.Name == name {
+			return machine, nil
+		}
+	}
+	return m, errors.New("")
+}
+
 func (s mockMachineStorage) FindByGroup(groupID int) ([]models.Machine, error) {
 	var machines []models.Machine
 	for _, machine := range s.data {

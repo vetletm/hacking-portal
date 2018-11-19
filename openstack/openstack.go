@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"hacking-portal/db"
-	"hacking-portal/models"
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
@@ -111,14 +110,16 @@ func Init() {
 	// iterate through all servers and attempt to put them into the database
 	for _, server := range allServers {
 		if strings.HasPrefix(strings.ToLower(server.Name), "kali") {
-			// machine exists, update in database
-			if err := machines.Upsert(models.Machine{
-				Name:    server.Name,
-				UUID:    server.ID,
-				Address: getFloating(server),
-			}); err != nil {
-				log.Fatal("Attempted to insert new machine into db, error:", err)
-				return
+			// machine found, update in database
+			if machine, err := machines.FindByName(server.Name); err != nil {
+				log.Fatal("Failed to access database")
+			} else {
+				machine.UUID = server.ID
+				machine.Address = getFloating(server)
+
+				if err := machines.Upsert(machine); err != nil {
+					log.Fatal("Attempted to insert new machine into db, error:", err)
+				}
 			}
 		}
 	}

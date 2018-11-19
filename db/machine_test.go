@@ -47,6 +47,18 @@ func TestMachineFindByID(t *testing.T) {
 	require.EqualValues(t, "foo", machine.Name)
 }
 
+func TestMachineFindByName(t *testing.T) {
+	// new database type
+	tdb := MachineDatabase{}
+
+	// attempt to find machine by ID
+	machine, err := tdb.FindByName("foo") // from the Upsert test
+
+	// assert output
+	require.Nil(t, err, "failed to get single machine")
+	require.EqualValues(t, "1234", machine.UUID)
+}
+
 func TestMachineFindByGroup(t *testing.T) {
 	// new database type
 	tdb := MachineDatabase{}

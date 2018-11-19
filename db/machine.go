@@ -14,6 +14,7 @@ import (
 type MachineStorage interface {
 	FindAll() ([]models.Machine, error)
 	FindByID(string) (models.Machine, error)
+	FindByName(string) (models.Machine, error)
 	FindByGroup(int) ([]models.Machine, error)
 	Upsert(models.Machine) error
 }
@@ -32,6 +33,13 @@ func (MachineDatabase) FindAll() ([]models.Machine, error) {
 func (MachineDatabase) FindByID(uuid string) (models.Machine, error) {
 	var machine models.Machine
 	err := db.C("machines").Find(bson.M{"uuid": uuid}).One(&machine)
+	return machine, err
+}
+
+// FindByName returns a single machine by name
+func (MachineDatabase) FindByName(name string) (models.Machine, error) {
+	var machine models.Machine
+	err := db.C("machines").Find(bson.M{"name": name}).One(&machine)
 	return machine, err
 }
 
