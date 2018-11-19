@@ -5,4 +5,13 @@ mongo_root_user: foo
 mongo_root_pass: bar
 mongo_service_user: foo
 mongo_service_pass: bar
-
+ldap_address: at.example.com
+ldap_dc: dc=example,dc=com
+course_code: imt0000
+admin_users: foo bar
+os_url: https://os.example.com:5000/v3
+os_project_id: 1234567890abcdef
+os_user_domain_name: Default
+os_username: foo
+os_password: bar
+os_region_name: example_region
