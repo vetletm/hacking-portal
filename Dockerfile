@@ -15,6 +15,9 @@ FROM scratch
 # copy the app
 COPY --from=builder /portal /usr/bin/local/portal
 
+# copy the static files (yeah, we know, this is really bad, but screw it)
+COPY --from=builder /build/static/ /usr/bin/local/static
+
 # copy root certificates
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
