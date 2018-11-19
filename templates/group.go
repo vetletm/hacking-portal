@@ -5,6 +5,7 @@ const Group = `
 {{define "title"}}Group {{.User.GroupID}}{{end}}
 
 {{define "body"}}
+{{$machines := .Machines}}
 <div class='container w-50'>
 	<header class='m-5'>
 		<h1>Group {{.User.GroupID}}</h1>
@@ -15,10 +16,10 @@ const Group = `
 			<h3>Kali Machines</h3>
 			{{if .Machines}}
 			<div class='list-group pb-2'>
-			{{range .Machines}}
+			{{range $i, $machine := $machines}}
 				<div class='list-group-item clearfix'>
-					<span class='float-left'>Kali {{.GroupIndex}} <a class='d-inline pl-3' href='#'>{{.Address}}</a></span>
-					<span class='float-right' data-kali-uuid='{{.ID}}'>
+					<span class='float-left'>Kali {{inc $i}} <a class='d-inline pl-3' href='#'>{{$machine.Address}}</a></span>
+					<span class='float-right' data-kali-uuid='{{$machine.UUID}}'>
 						<a class='btn btn-sm btn-outline-default border restart' href='#' data-toggle='tooltip' title='Restart'>
 							<span class='fas fa-redo' aria-hidden='true'></span>
 						</a>

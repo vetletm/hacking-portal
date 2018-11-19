@@ -48,8 +48,15 @@ func (storage *GroupEndpoint) GetDashboard(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// add some handy functions to the template engine
+	funcMap := template.FuncMap{
+		"inc": func(i int) int {
+			return i + 1
+		},
+	}
+
 	// prepare and ensure validity of template files
-	tpl := template.Must(template.New("layout").Parse(templates.Layout + templates.Navigation + templates.Group))
+	tpl := template.Must(template.New("layout").Funcs(funcMap).Parse(templates.Layout + templates.Navigation + templates.Group))
 
 	// render the templates with data
 	tpl.ExecuteTemplate(w, "layout", pageData)
