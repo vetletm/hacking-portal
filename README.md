@@ -27,6 +27,8 @@ What could be improved:
 - Storing sessions in the database to allow load balancing
 - Sessions could be handled with a 3rd-party library, such as [gorilla/sessions](https://github.com/gorilla/sessions)
 - Handing the creation of Kali machines in-house to allow management and distribution of private keys
+- Metalinting
+	- The remaining issues with gometalinter is a difference in opinion
 
 We managed to get a working example with a good enough UI/UX using the Bootstrap CSS framework, enough to impress the IMT3004 lecturers that suggested the project topic.
 
