@@ -111,15 +111,17 @@ func Init() {
 	for _, server := range allServers {
 		if strings.HasPrefix(strings.ToLower(server.Name), "kali") {
 			// machine found, update in database
-			if machine, err := machines.FindByName(server.Name); err != nil {
-				log.Fatal("Failed to access database")
-			} else {
-				machine.UUID = server.ID
-				machine.Address = getFloating(server)
+			machine, err := machines.FindByName(server.Name)
+			if err != nil {
+				// machine doesn't exist, let's add it
+				machine.Name = server.Name
+			}
 
-				if err := machines.Upsert(machine); err != nil {
-					log.Fatal("Attempted to insert new machine into db, error:", err)
-				}
+			machine.UUID = server.ID
+			machine.Address = getFloating(server)
+
+			if err := machines.Upsert(machine); err != nil {
+				log.Fatal("Attempted to insert new machine into db, error:", err)
 			}
 		}
 	}
