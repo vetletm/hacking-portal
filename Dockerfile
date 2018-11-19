@@ -7,7 +7,7 @@ WORKDIR /build
 COPY . ./
 
 # build the app
-RUN GO111MODULE=on go build -o /portal .
+RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /portal .
 
 # create our actual image with the compiled binary
 FROM scratch
